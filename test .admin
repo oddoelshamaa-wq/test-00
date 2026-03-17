@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم شيخ البلد - التقييمات الشاملة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #e67e22; 
+            --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2c1100 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0; font-family: 'Cairo', sans-serif;
+            background: var(--bg-gradient); background-attachment: fixed;
+            color: white; min-height: 100vh; padding: 20px;
+        }
+
+        .dashboard-container { max-width: 1300px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 40px; }
+        .logo-small { width: 80px; background: #fff; border-radius: 50%; padding: 5px; border: 2px solid var(--primary-color); }
+
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card {
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); padding: 20px;
+            border-radius: 20px; text-align: center; transition: 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
+        .stat-card i { font-size: 30px; color: var(--primary-color); margin-bottom: 10px; }
+        .stat-card h3 { margin: 5px 0; font-size: 14px; color: #aaa; }
+        .stat-card .value { font-size: 24px; font-weight: bold; }
+
+        /* Table Section */
+        .reviews-section {
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 25px;
+            padding: 25px; overflow-x: auto;
+        }
+
+        h2 { border-right: 4px solid var(--primary-color); padding-right: 15px; margin-bottom: 25px; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        th {
+            text-align: right; padding: 15px;
+            background: rgba(230, 126, 34, 0.2); color: var(--primary-color);
+            border-bottom: 2px solid var(--glass-border); font-size: 13px;
+        }
+        td { padding: 15px; border-bottom: 1px solid var(--glass-border); font-size: 13px; vertical-align: top; }
+
+        .star-rating { color: #f1c40f; font-size: 11px; display: block; white-space: nowrap; }
+        .branch-badge { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; font-size: 11px; }
+        
+        .details-box { font-size: 12px; color: #ccc; line-height: 1.6; max-width: 250px; }
+        .details-box b { color: var(--primary-color); font-size: 11px; }
+
+        .empty-state { text-align: center; padding: 50px; color: #888; }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <header>
+            <img src="images.jpg" alt="شيخ البلد" class="logo-small">
+            <h1>لوحة تحكم تقييمات العملاء</h1>
+            <p>متابعة تفصيلية لجودة الغذاء والخدمة وطلبات العملاء</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>إجمالي التقييمات</h3>
+                <div class="value" id="totalReviews">0</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-star-half-alt"></i>
+                <h3>متوسط الرضا العام</h3>
+                <div class="value" id="avgRating">0.0</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-map-marker-alt"></i>
+                <h3>أكثر الفروع تفاعلاً</h3>
+                <div class="value" id="topBranch">-</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-percentage"></i>
+                <h3>نسبة الرضا</h3>
+                <div class="value" id="satisfaction">0%</div>
+            </div>
+        </div>
+
+        <div class="reviews-section">
+            <h2>سجل التقييمات التفصيلي</h2>
+            <table id="reviewsTable">
+                <thead>
+                    <tr>
+                        <th>العميل ورقم الهاتف</th>
+                        <th>الفرع</th>
+                        <th>التقييمات (نجمات)</th>
+                        <th>التكرار</th>
+                        <th>ملاحظات واقتراحات</th>
+                        <th>التاريخ والوقت</th>
+                    </tr>
+                </thead>
+                <tbody id="reviewsBody">
+                    <!-- البيانات تظهر هنا -->
+                </tbody>
+            </table>
+            <div id="noData" class="empty-state" style="display: none;">
+                <i class="fas fa-folder-open" style="font-size: 40px; margin-bottom: 10px;"></i>
+                <p>لا توجد بيانات مسجلة في النظام الحالي</p>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyB1J7lSkqHHShPlkvtIUwpgmgsGqJ1uhJQ",
+        authDomain: "sheikh-pro-61502.firebaseapp.com",
+        databaseURL: "https://sheikh-pro-61502-default-rtdb.firebaseio.com",
+        projectId: "sheikh-pro-61502",
+        storageBucket: "sheikh-pro-61502.firebasestorage.app",
+        messagingSenderId: "388665698743",
+        appId: "1:388665698743:web:7eca2bfc0223f9c1736032"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    function renderStars(count, label) {
+        let stars = '';
+        for(let i=0; i<5; i++) {
+            stars += `<i class="${i < count ? 'fas' : 'far'} fa-star"></i>`;
+        }
+        return `<div class="star-rating"><b>${label}:</b> ${stars}</div>`;
+    }
+
+    // الربط مع المسار الجديد final_feedback
+    const reviewsRef = ref(db, 'final_feedback');
+    
+    onValue(reviewsRef, (snapshot) => {
+        const tbody = document.getElementById('reviewsBody');
+        const data = snapshot.val();
+
+        if (!data) {
+            document.getElementById('noData').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('noData').style.display = 'none';
+        tbody.innerHTML = '';
+        
+        let totalScore = 0;
+        let branchCounts = {};
+        let count = 0;
+
+        // ترتيب التقييمات من الأحدث للأقدم
+        Object.keys(data).reverse().forEach(key => {
+            const item = data[key];
+            count++;
+            
+            // حساب المتوسط بناءً على الأربع تصنيفات الجديدة
+            const ratings = item.ratings || {product:0, service:0, clean:0, overall:0};
+            const avgItem = (ratings.product + ratings.service + ratings.clean + ratings.overall) / 4;
+            totalScore += avgItem;
+            
+            branchCounts[item.branch] = (branchCounts[item.branch] || 0) + 1;
+
+            const row = `
+                <tr>
+                    <td>
+                        <strong>${item.name || 'مجهول'}</strong><br>
+                        <a href="tel:${item.phone}" style="color:var(--primary-color); text-decoration:none;">
+                            <i class="fas fa-phone-alt" style="font-size:10px"></i> ${item.phone || '-'}
+                        </a>
+                    </td>
+                    <td><span class="branch-badge">${item.branch || 'غير محدد'}</span></td>
+                    <td>
+                        ${renderStars(ratings.product, 'المنتج')}
+                        ${renderStars(ratings.service, 'الخدمة')}
+                        ${renderStars(ratings.clean, 'النظافة')}
+                        ${renderStars(ratings.overall, 'العام')}
+                    </td>
+                    <td style="text-align:center">${item.visits_per_month || '-'}</td>
+                    <td>
+                        <div class="details-box">
+                            ${item.distinction ? `<b>يميزنا:</b> ${item.distinction}<br>` : ''}
+                            ${item.liked_product ? `<b>أعجبه:</b> ${item.liked_product}<br>` : ''}
+                            ${item.suggested_product ? `<b>اقترح:</b> ${item.suggested_product}` : ''}
+                            ${(!item.distinction && !item.liked_product && !item.suggested_product) ? 'لا توجد ملاحظات' : ''}
+                        </div>
+                    </td>
+                    <td><small style="color:#888">${item.time || '-'}</small></td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+
+        // تحديث أرقام الإحصائيات
+        document.getElementById('totalReviews').innerText = count;
+        const avg = (totalScore / count).toFixed(1);
+        document.getElementById('avgRating').innerText = avg;
+        document.getElementById('satisfaction').innerText = Math.round((avg / 5) * 100) + '%';
+        
+        const topBranchName = Object.keys(branchCounts).reduce((a, b) => branchCounts[a] > branchCounts[b] ? a : b, 'لا يوجد');
+        document.getElementById('topBranch').innerText = topBranchName;
+    });
+</script>
+</body>
+</html>
