@@ -3,218 +3,816 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة تحكم شيخ البلد - التقييمات الشاملة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        :root {
-            --primary-color: #e67e22; 
-            --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2c1100 100%);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            margin: 0; font-family: 'Cairo', sans-serif;
-            background: var(--bg-gradient); background-attachment: fixed;
-            color: white; min-height: 100vh; padding: 20px;
-        }
-
-        .dashboard-container { max-width: 1300px; margin: 0 auto; }
-
-        header { text-align: center; margin-bottom: 40px; }
-        .logo-small { width: 80px; background: #fff; border-radius: 50%; padding: 5px; border: 2px solid var(--primary-color); }
-
-        /* Stats Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .stat-card {
-            background: var(--glass-bg); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); padding: 20px;
-            border-radius: 20px; text-align: center; transition: 0.3s;
-        }
-        .stat-card:hover { transform: translateY(-5px); border-color: var(--primary-color); }
-        .stat-card i { font-size: 30px; color: var(--primary-color); margin-bottom: 10px; }
-        .stat-card h3 { margin: 5px 0; font-size: 14px; color: #aaa; }
-        .stat-card .value { font-size: 24px; font-weight: bold; }
-
-        /* Table Section */
-        .reviews-section {
-            background: var(--glass-bg); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); border-radius: 25px;
-            padding: 25px; overflow-x: auto;
-        }
-
-        h2 { border-right: 4px solid var(--primary-color); padding-right: 15px; margin-bottom: 25px; }
-
-        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-        th {
-            text-align: right; padding: 15px;
-            background: rgba(230, 126, 34, 0.2); color: var(--primary-color);
-            border-bottom: 2px solid var(--glass-border); font-size: 13px;
-        }
-        td { padding: 15px; border-bottom: 1px solid var(--glass-border); font-size: 13px; vertical-align: top; }
-
-        .star-rating { color: #f1c40f; font-size: 11px; display: block; white-space: nowrap; }
-        .branch-badge { background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; font-size: 11px; }
-        
-        .details-box { font-size: 12px; color: #ccc; line-height: 1.6; max-width: 250px; }
-        .details-box b { color: var(--primary-color); font-size: 11px; }
-
-        .empty-state { text-align: center; padding: 50px; color: #888; }
-    </style>
+    <title>لوحة تحكم قرمشة - متابعة الطلبات</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="dashboard-container">
-        <header>
-            <img src="images.jpg" alt="شيخ البلد" class="logo-small">
-            <h1>لوحة تحكم تقييمات العملاء</h1>
-            <p>متابعة تفصيلية لجودة الغذاء والخدمة وطلبات العملاء</p>
-        </header>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <i class="fas fa-clipboard-list"></i>
-                <h3>إجمالي التقييمات</h3>
-                <div class="value" id="totalReviews">0</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-star-half-alt"></i>
-                <h3>متوسط الرضا العام</h3>
-                <div class="value" id="avgRating">0.0</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-map-marker-alt"></i>
-                <h3>أكثر الفروع تفاعلاً</h3>
-                <div class="value" id="topBranch">-</div>
-            </div>
-            <div class="stat-card">
-                <i class="fas fa-percentage"></i>
-                <h3>نسبة الرضا</h3>
-                <div class="value" id="satisfaction">0%</div>
-            </div>
+    <!-- شاشة تسجيل الدخول للموظفين -->
+    <div id="admin-login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#d2000a; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; color:white;">
+        <img src="5515928d-da81-433e-8bc9-245180ba6724.jpg" style="width:150px; border-radius:20px; margin-bottom:20px;">
+        <h2>تسجيل دخول الموظفين</h2>
+        <div style="background:white; padding:30px; border-radius:15px; display:flex; flex-direction:column; gap:10px; width:300px;">
+            <input type="text" id="admin-user" placeholder="اسم المستخدم" style="padding:10px; border:1px solid #ddd; border-radius:5px;">
+            <input type="password" id="admin-pass" placeholder="كلمة المرور" style="padding:10px; border:1px solid #ddd; border-radius:5px;">
+            <button onclick="handleAdminLogin()" style="background:#d2000a; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold;">دخول</button>
         </div>
-
-        <div class="reviews-section">
-            <h2>سجل التقييمات التفصيلي</h2>
-            <table id="reviewsTable">
-                <thead>
-                    <tr>
-                        <th>العميل ورقم الهاتف</th>
-                        <th>الفرع</th>
-                        <th>التقييمات (نجمات)</th>
-                        <th>التكرار</th>
-                        <th>ملاحظات واقتراحات</th>
-                        <th>التاريخ والوقت</th>
-                    </tr>
-                </thead>
-                <tbody id="reviewsBody">
-                    <!-- البيانات تظهر هنا -->
-                </tbody>
-            </table>
-            <div id="noData" class="empty-state" style="display: none;">
-                <i class="fas fa-folder-open" style="font-size: 40px; margin-bottom: 10px;"></i>
-                <p>لا توجد بيانات مسجلة في النظام الحالي</p>
-            </div>
-        </div>
+        <p id="login-error" style="color:yellow; margin-top:10px; display:none;">خطأ في البيانات!</p>
     </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyB1J7lSkqHHShPlkvtIUwpgmgsGqJ1uhJQ",
-        authDomain: "sheikh-pro-61502.firebaseapp.com",
-        databaseURL: "https://sheikh-pro-61502-default-rtdb.firebaseio.com",
-        projectId: "sheikh-pro-61502",
-        storageBucket: "sheikh-pro-61502.firebasestorage.app",
-        messagingSenderId: "388665698743",
-        appId: "1:388665698743:web:7eca2bfc0223f9c1736032"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    function renderStars(count, label) {
-        let stars = '';
-        for(let i=0; i<5; i++) {
-            stars += `<i class="${i < count ? 'fas' : 'far'} fa-star"></i>`;
-        }
-        return `<div class="star-rating"><b>${label}:</b> ${stars}</div>`;
-    }
-
-    // الربط مع المسار الجديد final_feedback
-    const reviewsRef = ref(db, 'final_feedback');
-    
-    onValue(reviewsRef, (snapshot) => {
-        const tbody = document.getElementById('reviewsBody');
-        const data = snapshot.val();
-
-        if (!data) {
-            document.getElementById('noData').style.display = 'block';
-            return;
-        }
-
-        document.getElementById('noData').style.display = 'none';
-        tbody.innerHTML = '';
+    <!-- القائمة الجانبية (Sidebar) -->
+    <div class="sidebar">
+        <div class="admin-logo-section">
+            <img src="5515928d-da81-433e-8bc9-245180ba6724.jpg" alt="Admin Logo" class="admin-logo">
+            <p>لوحة التحكم</p>
+        </div>
         
-        let totalScore = 0;
-        let branchCounts = {};
-        let count = 0;
+        <nav class="side-nav">
+            <ul>
+                <li id="nav-orders" class="active"><a href="#"><i class="fas fa-bell"></i> الطلبات الحية</a></li>
+                <li id="nav-records"><a href="#"><i class="fas fa-chart-line"></i> السجل والإحصائيات</a></li>
+                <li id="nav-chat"><a href="#"><i class="fas fa-comments"></i> شات العملاء</a></li>
+                <!-- الحاجات دي للمدير فقط -->
+                <li id="nav-products" class="manager-only"><a href="#"><i class="fas fa-box"></i> إدارة المنتجات</a></li>
+                <li id="nav-categories" class="manager-only"><a href="#"><i class="fas fa-list"></i> إدارة الأقسام</a></li>
+                <li id="nav-add-product" class="manager-only"><a href="#"><i class="fas fa-plus-circle"></i> إضافة منتج جديد</a></li>
+                <li id="nav-staff" class="manager-only"><a href="#"><i class="fas fa-user-tie"></i> الموظفين</a></li>
+            </ul>
+        </nav>
 
-        // ترتيب التقييمات من الأحدث للأقدم
-        Object.keys(data).reverse().forEach(key => {
-            const item = data[key];
-            count++;
-            
-            // حساب المتوسط بناءً على الأربع تصنيفات الجديدة
-            const ratings = item.ratings || {product:0, service:0, clean:0, overall:0};
-            const avgItem = (ratings.product + ratings.service + ratings.clean + ratings.overall) / 4;
-            totalScore += avgItem;
-            
-            branchCounts[item.branch] = (branchCounts[item.branch] || 0) + 1;
+        <button class="logout-btn"><i class="fas fa-sign-out-alt"></i> خروج</button>
+    </div>
 
-            const row = `
-                <tr>
-                    <td>
-                        <strong>${item.name || 'مجهول'}</strong><br>
-                        <a href="tel:${item.phone}" style="color:var(--primary-color); text-decoration:none;">
-                            <i class="fas fa-phone-alt" style="font-size:10px"></i> ${item.phone || '-'}
-                        </a>
-                    </td>
-                    <td><span class="branch-badge">${item.branch || 'غير محدد'}</span></td>
-                    <td>
-                        ${renderStars(ratings.product, 'المنتج')}
-                        ${renderStars(ratings.service, 'الخدمة')}
-                        ${renderStars(ratings.clean, 'النظافة')}
-                        ${renderStars(ratings.overall, 'العام')}
-                    </td>
-                    <td style="text-align:center">${item.visits_per_month || '-'}</td>
-                    <td>
-                        <div class="details-box">
-                            ${item.distinction ? `<b>يميزنا:</b> ${item.distinction}<br>` : ''}
-                            ${item.liked_product ? `<b>أعجبه:</b> ${item.liked_product}<br>` : ''}
-                            ${item.suggested_product ? `<b>اقترح:</b> ${item.suggested_product}` : ''}
-                            ${(!item.distinction && !item.liked_product && !item.suggested_product) ? 'لا توجد ملاحظات' : ''}
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+        <header class="top-bar">
+            <div class="server-status">
+                <span class="dot"></span> متصل بالخادم
+            </div>
+            <div class="page-title" id="current-page-title">
+                ⚡ الطلبات الحية
+            </div>
+        </header>
+
+        <!-- قسم الطلبات الحية (شغال افتراضياً) -->
+        <section id="live-orders-section" class="admin-section active">
+            <div class="orders-container">
+
+                <!-- عمود الطلبات الجديدة -->
+                <div class="order-column">
+                    <div class="column-header red-header">
+                        <span><i class="fas fa-star"></i> طلبات جديدة راجعها</span>
+                    </div>
+
+                    <div class="order-list" id="new-orders">
+                        <!-- كارت طلب -->
+                        <div class="order-card">
+                            <div class="card-header">
+                                <span class="order-id">#eJ5H</span>
+                                <span class="order-time">07:42 م</span>
+                            </div>
+                            <div class="customer-info">
+                                <h4>شمشيم</h4>
+                                <p><i class="fas fa-map-marker-alt"></i> المعادي - يش</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="details-btn">التفاصيل</button>
+                                <span class="price">30 ج</span>
+                            </div>
                         </div>
-                    </td>
-                    <td><small style="color:#888">${item.time || '-'}</small></td>
-                </tr>
-            `;
-            tbody.innerHTML += row;
+
+                        <div class="order-card">
+                            <div class="card-header">
+                                <span class="order-id">#OvsK</span>
+                                <span class="order-time">02:21 م</span>
+                            </div>
+                            <div class="customer-info">
+                                <h4>محمود</h4>
+                                <p><i class="fas fa-map-marker-alt"></i> مصر الجديدة - عمارة 17B، شارع محمد بدر</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="details-btn">التفاصيل</button>
+                                <span class="price">37 ج</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- عمود في المطبخ -->
+                <div class="order-column">
+                    <div class="column-header blue-header">
+                        <span><i class="fas fa-fire"></i> في المطبخ (جاري)</span>
+                    </div>
+
+                    <div class="order-list" id="kitchen-orders">
+                        <div class="order-card kitchen-card">
+                            <div class="card-header">
+                                <span class="order-id">#LKCu</span>
+                                <span class="order-time">10:03 ص</span>
+                            </div>
+                            <div class="customer-info">
+                                <h4>محمود</h4>
+                                <p><i class="fas fa-map-marker-alt"></i> مصر الجديدة - عمارة 17B، شارع محمد بدر</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="details-btn">التفاصيل</button>
+                                <span class="price">37 ج</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- قسم إدارة المنتجات -->
+        <section id="manage-products-section" class="admin-section">
+            <div class="table-container">
+                <h3>قائمة وجبات مطعم قرمشة</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الوجبة</th>
+                            <th>السعر (عادي)</th>
+                            <th>القسم</th>
+                            <th>الحالة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                        <!-- المنتجات ستُحمل ديناميكياً -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- قسم إدارة أقسام المنيو في صفحة الأدمن -->
+        <section id="manage-categories-section" class="admin-section">
+            <div class="table-container">
+                <h3>إدارة أقسام المنيو (القائمة العلوية)</h3>
+                <div class="admin-card">
+                    <h3>إضافة قسم جديد للقائمة</h3>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="categoryInput" placeholder="اكتب اسم القسم (مثلاً: عروض الشتاء)">
+                        <button onclick="saveCategory()" class="btn-add">إضافة القسم</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>اسم القسم</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-categories-table">
+                        <!-- الأقسام هتظهر هنا برمجياً -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- قسم إضافة منتج جديد -->
+        <section id="add-product-section" class="admin-section">
+            <div class="form-container">
+                <h3>إضافة وجبة جديدة للمنيو</h3>
+                <form id="add-food-form">
+                    <input type="text" id="food-name" placeholder="اسم الوجبة" required>
+                    <div class="prices-section">
+                        <label>الأحجام والأسعار:</label>
+                        <div id="prices-container">
+                            <!-- أول صف هيكون موجود دايماً -->
+                            <div class="price-row">
+                                <input type="text" placeholder="الحجم (مثلاً: وسط)" class="size-input">
+                                <input type="number" placeholder="السعر" class="price-input">
+                            </div>
+                        </div>
+                        <button type="button" onclick="addPriceRow()" class="btn-add-size">+ إضافة حجم آخر</button>
+                    </div>
+                    <input type="file" id="food-img-file" accept="image/*">
+                    <textarea id="food-desc" placeholder="وصف الوجبة"></textarea>
+                    <select id="categorySelect" required>
+                        <option value="">اختر القسم</option>
+                    </select>
+                    <button type="submit" class="btn-main-red">حفظ المنتج</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- قسم سجل الطلبات -->
+        <section id="records-section" class="admin-section">
+            <div class="table-container" style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>📋 سجل المبيعات والطلبات</h3>
+                    <div class="filter-box">
+                        <input type="text" id="searchOrders" placeholder="بحث باسم العميل أو الرقم..." onkeyup="filterRecords()" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                    </div>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; text-align: right;">
+                    <thead>
+                        <tr style="background: #f8f9fa; border-bottom: 2px solid #eee;">
+                            <th style="padding: 15px;">رقم الطلب</th>
+                            <th>التاريخ</th>
+                            <th>العميل</th>
+                            <th>الوجبات</th>
+                            <th>الإجمالي</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-table-body">
+                        <!-- البيانات هتظهر هنا بالـ JS -->
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 20px; padding: 15px; background: #e31e24; color: white; border-radius: 10px; display: inline-block;">
+                    إجمالي مبيعات السجل: <span id="total-sales-amount" style="font-weight: bold; font-size: 20px;">0</span> ج.م
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم إدارة الموظفين المطور -->
+        <section id="manage-staff-section" class="admin-section">
+            <div class="staff-header-top">
+                <i class="fas fa-users-cog"></i>
+                <h3>إدارة طاقم العمل والصلاحيات</h3>
+            </div>
+
+            <!-- كارت إضافة موظف جديد -->
+            <div class="admin-card staff-form-card">
+                <div class="card-title"><i class="fas fa-user-plus"></i> إضافة موظف جديد</div>
+
+                <div class="staff-inputs-grid">
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="staff-username" placeholder="اسم المستخدم (للإدمن)">
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="staff-password" placeholder="كلمة المرور">
+                    </div>
+                    <div class="input-with-icon">
+                        <i class="fas fa-briefcase"></i>
+                        <input type="text" id="staff-job-title" placeholder="المسمى الوظيفي (كاشير، شيف..)">
+                    </div>
+                </div>
+
+                <div class="permissions-container">
+                    <p class="perm-title"><i class="fas fa-shield-alt"></i> تحديد صلاحيات الوصول:</p>
+                    <div class="permissions-grid">
+                        <label class="perm-item">
+                            <input type="checkbox" class="perm-check" value="orders">
+                            <span>الطلبات الحية</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" class="perm-check" value="records">
+                            <span>السجل والإحصائيات</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" class="perm-check" value="chat">
+                            <span>شات العملاء</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" class="perm-check" value="products">
+                            <span>إدارة المنتجات</span>
+                        </label>
+                        <label class="perm-item">
+                            <input type="checkbox" class="perm-check" value="categories">
+                            <span>إدارة الأقسام</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button onclick="saveNewStaff()" class="btn-save-staff">
+                    <i class="fas fa-check-circle"></i> حفظ بيانات الموظف
+                </button>
+            </div>
+
+            <!-- جدول عرض الموظفين المطور -->
+            <div class="table-container staff-table-card">
+                <div class="card-title"><i class="fas fa-user-shield"></i> الموظفون الحاليون</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>الموظف</th>
+                            <th>الوظيفة</th>
+                            <th>الصلاحيات الممنوحة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staff-table-body">
+                        <!-- الموظفين هيظهروا هنا برمجياً -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+
+      <script>
+        // بيانات الموظفين (مؤقتاً لحد ما تربطها بفايربيز)
+        const staffDatabase = [
+            { user: "admin", pass: "123", role: "مدير" },
+            { user: "order1", pass: "456", role: "متلقي" }
+        ];
+
+        window.handleAdminLogin = async function() {
+            const userInp = document.getElementById('admin-user').value.trim();
+            const passInp = document.getElementById('admin-pass').value.trim();
+
+            // 1. دخول "السوبر أدمن" (admin) - شغال دايماً حتى لو مفيش نت
+            if (userInp === "admin" && passInp === "123") {
+                document.getElementById('admin-login-overlay').style.display = 'none';
+
+                // إعطاء صلاحيات كاملة للمدير
+                const fullPerms = {
+                    orders: true, records: true, chat: true,
+                    products: true, categories: true
+                };
+                applyDynamicPermissions(fullPerms);
+
+                // تشغيل جلب البيانات بعد الدخول
+                if (typeof loadStaffList === "function") loadStaffList();
+                if (typeof loadProds === "function") loadProds();
+
+                console.log("تم الدخول بصلاحية السوبر أدمن");
+                return;
+            }
+
+            // 2. المحاولة مع السيرفر للموظفين الآخرين
+            try {
+                if (!window.db) {
+                    throw new Error("قاعدة البيانات لم تتحمل بعد");
+                }
+
+                // نستخدم window. للتأكد من الوصول للدوال
+                const q = window.query(
+                    window.collection(window.db, "staff"),
+                    window.where("username", "==", userInp),
+                    window.where("password", "==", passInp)
+                );
+
+                const querySnapshot = await window.getDocs(q);
+
+                if (!querySnapshot.empty) {
+                    const staffData = querySnapshot.docs[0].data();
+                    document.getElementById('admin-login-overlay').style.display = 'none';
+                    applyDynamicPermissions(staffData.permissions);
+                } else {
+                    alert("اسم المستخدم أو الباسورد غلط يا بطل!");
+                }
+            } catch (e) {
+                console.error("Firebase Error:", e);
+                // لو ظهر لك الخطأ ده تانى، بص على الـ Console (F12) هتلاقي رابط Index دوس عليه
+                alert("فيه مشكلة في السيرفر.. ادخل باليوزر admin حالياً");
+            }
+        };
+
+        function applyDynamicPermissions(perms) {
+            // إخفاء/إظهار العناصر بناءً على الصلاحيات المخزنة
+            if(!perms.orders) document.getElementById('nav-orders').style.display = 'none';
+            if(!perms.records) document.getElementById('nav-records').style.display = 'none';
+            if(!perms.chat) document.getElementById('nav-chat').style.display = 'none';
+            if(!perms.products) document.getElementById('nav-products').style.display = 'none';
+            if(!perms.categories) document.getElementById('nav-categories').style.display = 'none';
+
+            // إخفاء أزرار الإضافة لو ملوش صلاحية منتجات
+            if(!perms.products) {
+                document.getElementById('nav-add-product').style.display = 'none';
+                document.getElementById('nav-staff').style.display = 'none';
+            }
+        }
+
+        // تعديل دالة الخروج (Logout)
+        document.querySelector('.logout-btn').onclick = () => {
+            location.reload(); // أسهل طريقة لعمل تسجيل خروج هي إعادة تحميل الصفحة
+        };
+      </script>
+
+      <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, onSnapshot, orderBy, doc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyArc3Y--aq-6e8omAbcpm8fZ5BvNcYMtkw",
+            authDomain: "karmasha-bfad3.firebaseapp.com",
+            projectId: "karmasha-bfad3",
+            storageBucket: "karmasha-bfad3.firebasestorage.app",
+            messagingSenderId: "584846393500",
+            appId: "1:584846393500:web:5a58f969f3a66126026d59",
+            measurementId: "G-G518D7LXSS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db;
+
+        // أضف هذه الأسطر لربط دوال فايربيز بالنافذة العالمية
+        window.query = query;
+        window.where = where;
+        window.collection = collection;
+        window.getDocs = getDocs;
+        window.orderBy = orderBy;
+
+        // تعريف صوت التنبيه (صوت جرس تنبيه)
+        const alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        alertSound.loop = false; // لو عاوزه يكرر الصوت خليه true
+        let isFirstLoad = true; // متغير عشان نمنع الصوت يشتغل لكل الطلبات القديمة أول ما تفتح الصفحة
+
+        const qOrders = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+
+        onSnapshot(qOrders, (snapshot) => {
+            const newO = document.getElementById('new-orders');
+            const kitO = document.getElementById('kitchen-orders');
+            newO.innerHTML = ''; kitO.innerHTML = '';
+
+            // مراقبة التغييرات (لو فيه أوردر جديد انضاف)
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === "added" && !isFirstLoad) {
+                    const order = change.doc.data();
+                    if (order.status === "جديد") {
+                        // تشغيل الصوت
+                        alertSound.play().catch(error => {
+                            console.log("المتصفح منع الصوت.. لازم تضغط في أي مكان في الصفحة الأول عشان يشتغل.");
+                        });
+
+                        // اختياري: إشعار في المتصفح
+                        if (Notification.permission === "granted") {
+                            new Notification("قرمشة - طلب جديد!", { body: `طلب جديد من ${order.customerName}` });
+                        }
+                    }
+                }
+            });
+
+            snapshot.forEach(d => {
+                const o = d.data();
+                const html = `
+                <div class="order-card">
+                    <div class="card-header"><span class="order-id">#${d.id.substring(0,4)}</span></div>
+                    <h4>${o.customerName}</h4>
+                    <p><i class="fas fa-phone"></i> ${o.customerPhone}</p>
+                    <p><i class="fas fa-map-marker-alt"></i> ${o.customerAddress}</p>
+                    <div style="font-size:13px; color:#d2000a; margin-top:8px; font-weight:bold; background:#fff1f1; padding:5px; border-radius:5px;">
+                        ${o.items.map(i => i.name).join(' + ')}
+                    </div>
+                    <div class="card-footer">
+                        ${o.status == 'جديد' ?
+                            `<button class="details-btn" onclick="window.upStat('${d.id}','في المطبخ')">قبول ✅</button>` :
+                            `<button class="details-btn" style="background:green; color:white;" onclick="window.upStat('${d.id}','تم')">تم التوصيل 🛵</button>`
+                        }
+
+                        <!-- زرار الإلغاء الجديد -->
+                        <button class="details-btn" style="background:#f44336; color:white; margin-right:5px;" onclick="window.askCancel('${d.id}')">إلغاء ❌</button>
+
+                        <span class="price">${o.totalPrice}ج</span>
+                    </div>
+                </div>`;
+
+                if(o.status == 'جديد') newO.innerHTML += html;
+                else if(o.status == 'في المطبخ') kitO.innerHTML += html;
+            });
+
+            isFirstLoad = false; // بعد أول تحميل، أي إضافة تانية هتشغل الصوت
+        });
+        window.upStat = async (id,s) => await updateDoc(doc(db,"orders",id),{status:s});
+
+        // دالة لإلغاء الطلب مع طلب السبب
+        window.askCancel = async (id) => {
+            const reason = prompt("يرجى إدخال سبب إلغاء الطلب (مثلاً: العميل لا يرد، المنتج غير متوفر):");
+
+            // لو الإدمن ضغط Cancel أو ساب الخانة فاضية
+            if (reason === null) return;
+            if (reason.trim() === "") {
+                alert("لازم تكتب سبب عشان تلغي الأوردر!");
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, "orders", id), {
+                    status: "ملغي",
+                    cancelReason: reason // حفظ السبب في فايربيز
+                });
+                alert("تم إلغاء الطلب وتسجيل السبب.");
+            } catch (e) {
+                console.error("خطأ في الإلغاء: ", e);
+            }
+        };
+
+        // طلب إذن إشعارات الويندوز
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        // 2. إدارة الأقسام (Firebase Categories - التعديل الجديد)
+        // دالة لعرض الأقسام في الجدول وفي قائمة إضافة المنتج
+        function listenToCategories() {
+            const q = query(collection(db, "categories"), orderBy("createdAt", "asc"));
+            onSnapshot(q, (snapshot) => {
+                const select = document.getElementById('categorySelect');
+                const table = document.getElementById('admin-categories-table');
+                
+                // تنظيف القوائم
+                select.innerHTML = '<option value="">اختر القسم</option>';
+                table.innerHTML = '';
+
+                snapshot.forEach(docSnap => {
+                    const cat = docSnap.data();
+                    // إضافة للجدول
+                    table.innerHTML += `
+                        <tr>
+                            <td>${cat.name}</td>
+                            <td><button onclick="window.deleteCategory('${docSnap.id}')" class="btn-edit" style="background:#c62828;">حذف</button></td>
+                        </tr>`;
+                    // إضافة للقائمة المنسدلة
+                    select.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+                });
+            });
+        }
+
+        // دالة حفظ قسم جديد في فايربيز
+        window.saveCategory = async function() {
+            const input = document.getElementById('categoryInput');
+            const name = input.value.trim();
+            if(!name) return alert("اكتب اسم القسم!");
+            
+            try {
+                await addDoc(collection(db, "categories"), {
+                    name: name,
+                    createdAt: serverTimestamp()
+                });
+                input.value = ''; // تفريغ الحقل
+                alert("تم إضافة القسم بنجاح ويظهر الآن في كل الأجهزة");
+            } catch(e) {
+                console.error(e);
+                alert("حدث خطأ في الإضافة");
+            }
+        }
+
+        // دالة حذف قسم
+        window.deleteCategory = async function(id) {
+            if(confirm("هل أنت متأكد من حذف هذا القسم؟")) {
+                await deleteDoc(doc(db, "categories", id));
+            }
+        }
+
+        // تشغيل مراقب الأقسام
+        listenToCategories();
+
+
+        // 3. المنتجات (Products)
+        window.saveProduct = async function() {
+            const name = document.getElementById('food-name').value;
+            const desc = document.getElementById('food-desc').value;
+            const cat = document.getElementById('categorySelect').value;
+            const rows = document.querySelectorAll('.price-row');
+            let prices = [];
+            
+            // تجميع الأسعار
+            rows.forEach(r => {
+                const s = r.querySelector('.size-input').value;
+                const p = r.querySelector('.price-input').value;
+                if(s && p) prices.push({size: s, price: parseInt(p)});
+            });
+
+            if(!cat) return alert("لازم تختار القسم!");
+            if(prices.length === 0) return alert("لازم تضيف سعر واحد على الأقل");
+
+            await addDoc(collection(db, "products"), { 
+                name, description: desc, category: cat, prices, img: window.productImg||'', createdAt: serverTimestamp() 
+            });
+            alert("تم حفظ المنتج!"); location.reload();
+        }
+
+        // تحميل المنتجات
+        async function loadProds() {
+            const s = await getDocs(collection(db, "products"));
+            const t = document.getElementById('products-table-body'); t.innerHTML='';
+            s.forEach(d => {
+                const p = d.data();
+                t.innerHTML+=`<tr><td>${p.name}</td><td>${p.prices && p.prices[0] ? p.prices[0].price : 'غير محدد'}</td><td>${p.category}</td><td><button onclick="window.delP('${d.id}')" style="color:red">X</button></td></tr>`;
+            });
+        }
+        window.delP = async(id) => { if(confirm('حذف؟')) await deleteDoc(doc(db,"products",id)); loadProds(); }
+        loadProds();
+
+        // معالجة الصور
+        window.productImg = "";
+        document.getElementById('food-img-file').addEventListener('change', e=>{
+            const r=new FileReader(); r.onload=()=>window.productImg=r.result; r.readAsDataURL(e.target.files[0]);
+        });
+        
+        // مساعدة الواجهة
+        window.addPriceRow = () => document.getElementById('prices-container').innerHTML += `<div class="price-row"><input type="text" class="size-input"><input type="number" class="price-input"><button type="button" onclick="this.parentElement.remove()">x</button></div>`;
+        document.getElementById('add-food-form').onsubmit=(e)=>{e.preventDefault();window.saveProduct()};
+
+        // Navigation
+        const items = document.querySelectorAll('.side-nav li');
+        const secs = document.querySelectorAll('.admin-section');
+        items.forEach(item => {
+            item.addEventListener('click', function() {
+                items.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+
+                secs.forEach(s => s.classList.remove('active'));
+
+                const t = this.innerText;
+                if(t.includes("الطلبات")) {
+                    document.getElementById('live-orders-section').classList.add('active');
+                } else if(t.includes("السجل")) {
+                    document.getElementById('records-section').classList.add('active');
+                    loadRecords(); // استدعاء دالة تحميل البيانات لما نفتح السجل
+                } else if(t.includes("المنتجات")) {
+                    document.getElementById('manage-products-section').classList.add('active');
+                } else if(t.includes("إضافة")) {
+                    document.getElementById('add-product-section').classList.add('active');
+                } else if(t.includes("الأقسام")) {
+                    document.getElementById('manage-categories-section').classList.add('active');
+                } else if(t.includes("الموظفين")) {
+                    document.getElementById('manage-staff-section').classList.add('active');
+                }
+            });
         });
 
-        // تحديث أرقام الإحصائيات
-        document.getElementById('totalReviews').innerText = count;
-        const avg = (totalScore / count).toFixed(1);
-        document.getElementById('avgRating').innerText = avg;
-        document.getElementById('satisfaction').innerText = Math.round((avg / 5) * 100) + '%';
-        
-        const topBranchName = Object.keys(branchCounts).reduce((a, b) => branchCounts[a] > branchCounts[b] ? a : b, 'لا يوجد');
-        document.getElementById('topBranch').innerText = topBranchName;
-    });
-</script>
+        // دالة تحميل سجل الطلبات بالكامل
+        async function loadRecords() {
+            const tableBody = document.getElementById('records-table-body');
+            const totalSalesDisplay = document.getElementById('total-sales-amount');
+
+            tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">جاري تحميل السجل...</td></tr>';
+
+            try {
+                // جلب كل الطلبات من الأحدث للأقدم
+                const q = query(collection(window.db, "orders"), orderBy("createdAt", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                tableBody.innerHTML = ''; // تفريغ الجدول
+                let totalSales = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const order = doc.data();
+                    const date = order.createdAt ? order.createdAt.toDate().toLocaleString('ar-EG') : 'غير مسجل';
+
+                    // حساب الإجمالي الكلي
+                    totalSales += parseFloat(order.totalPrice || 0);
+
+                    // تحويل قائمة الوجبات لنص
+                    const itemsList = order.items.map(i => i.name).join(' + ');
+
+                    let statusDisplay = order.status;
+
+                    // لو الحالة ملغي، ضيف السبب تحت الكلمة
+                    if (order.status === "ملغي") {
+                        const reason = order.cancelReason || "غير محدد";
+                        statusDisplay = `<span style="color:#ffc107;">ملغي</span><br><small style="color:#ffeb3b; font-size:10px;">السبب: ${reason}</small>`;
+                    } else {
+                        statusDisplay = `<span style="color:white;">${order.status}</span>`;
+                    }
+
+                    tableBody.innerHTML += `
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 12px;">#${doc.id.substring(0, 5)}</td>
+                            <td>${date}</td>
+                            <td>${order.customerName} <br> <small>${order.customerPhone}</small></td>
+                            <td>${itemsList}</td>
+                            <td>${order.totalPrice} ج</td>
+                            <td>
+                                <div class="status-badge" style="background:${getStatusColor(order.status)}; padding:5px; border-radius:5px; text-align:center;">
+                                    ${statusDisplay}
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                totalSalesDisplay.innerText = totalSales; // تحديث رقم إجمالي المبيعات
+
+            } catch (error) {
+                console.error("Error loading records: ", error);
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">فشل تحميل البيانات. تأكد من إعدادات الـ Index في Firebase.</td></tr>';
+            }
+        }
+
+        // دالة مساعدة لتلوين حالة الطلب
+        function getStatusColor(status) {
+            if (status === "جديد") return "#e31e24";
+            if (status === "في المطبخ") return "#1976d2";
+            if (status === "تم") return "#2e7d32";
+            if (status === "ملغي") return "#212121"; // أسود/رمادي غامق
+            return "#757575";
+        }
+
+        window.filterRecords = function() {
+            let input = document.getElementById("searchOrders").value.toLowerCase();
+            let rows = document.querySelectorAll("#records-table-body tr");
+
+            rows.forEach(row => {
+                let text = row.innerText.toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+
+        // 4. إدارة الموظفين (Staff)
+        // دالة حفظ الموظف بفايربيز
+        window.saveNewStaff = async function() {
+            console.log("جاري محاولة حفظ موظف..."); // للتأكد في الـ Console إن الزرار شغال
+
+            const user = document.getElementById('staff-username').value.trim();
+            const pass = document.getElementById('staff-password').value.trim();
+            const job = document.getElementById('staff-job-title').value.trim();
+
+            // جمع الصلاحيات
+            let permissions = {};
+            document.querySelectorAll('.perm-check').forEach(check => {
+                permissions[check.value] = check.checked;
+            });
+
+            if(!user || !pass) {
+                alert("يا بطل لازم تكتب اسم المستخدم والباسورد!");
+                return;
+            }
+
+            try {
+                await addDoc(collection(window.db, "staff"), {
+                    username: user,
+                    password: pass,
+                    jobTitle: job,
+                    permissions: permissions,
+                    createdAt: serverTimestamp()
+                });
+
+                alert("مبروك! الموظف انضاف بنجاح.");
+
+                // تفريغ الخانات بعد الحفظ
+                document.getElementById('staff-username').value = "";
+                document.getElementById('staff-password').value = "";
+                document.getElementById('staff-job-title').value = "";
+
+                // إعادة تحميل الجدول فوراً
+                loadStaffList();
+
+            } catch(e) {
+                console.error("Error saving staff:", e);
+                alert("حصلت مشكلة وأحنا بنحفظ البيانات");
+            }
+        };
+
+        // دالة تحميل قائمة الموظفين
+        window.loadStaffList = async function() {
+            const tbody = document.getElementById('staff-table-body');
+            if(!tbody) return;
+
+            tbody.innerHTML = '<tr><td colspan="4">جاري التحميل...</td></tr>';
+
+            try {
+                const snapshot = await getDocs(collection(window.db, "staff"));
+                tbody.innerHTML = ''; // تفريغ الجدول عشان نمليه
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="4">لا يوجد موظفين حالياً</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const s = docSnap.data();
+                    // تحويل الصلاحيات لنص مفهوم
+                    const permsKeys = {
+                        orders: "طلبات",
+                        records: "سجل",
+                        chat: "شات",
+                        products: "منتجات",
+                        categories: "أقسام"
+                    };
+                    const activePerms = Object.keys(s.permissions)
+                                        .filter(k => s.permissions[k])
+                                        .map(k => `<span class="perm-badge">${permsKeys[k]}</span>`) // تعديل هنا
+                                        .join(' ');
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${s.username}</strong></td>
+                            <td>${s.jobTitle || 'موظف'}</td>
+                            <td>${activePerms}</td>
+                            <td>
+                                <button onclick="deleteStaff('${docSnap.id}')" class="btn-delete-staff">
+                                    <i class="fas fa-trash-alt"></i> حذف
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+            } catch(e) {
+                console.error("Error loading staff:", e);
+                tbody.innerHTML = '<tr><td colspan="4">خطأ في تحميل الموظفين</td></tr>';
+            }
+        };
+
+        // دالة حذف الموظف
+        window.deleteStaff = async (id) => {
+            if(confirm("هل أنت متأكد من حذف هذا الموظف؟")) {
+                await deleteDoc(doc(window.db, "staff", id));
+                loadStaffList(); // تحديث الجدول
+            }
+        };
+
+    </script>
 </body>
 </html>
