@@ -1102,4 +1102,200 @@ footer {
 /* إخفاء الهيدر القديم تماماً */
 .main-header {
     display: none !important;
+}/* --- التصميم الكامل (The Ultimate Header) --- */
+.super-mobile-header {
+    background: #ffffff;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9999;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+/* السطر الأول: اللوجو والاتصال */
+.header-main-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+}
+
+.pro-logo {
+    height: 45px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.hotline-pro {
+    background: #e31e24;
+    color: #fff !important;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 900;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.user-icon-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #333;
+    cursor: pointer;
+}
+
+/* سطر البحث */
+.header-search-row {
+    padding: 0 15px 10px 15px;
+}
+.search-box {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.search-box i { color: #888; }
+.search-box input {
+    border: none;
+    background: none;
+    width: 100%;
+    outline: none;
+    font-size: 14px;
+    font-family: 'Cairo', sans-serif;
+}
+
+/* سطر الروابط */
+.header-nav-links {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 15px;
+    border-top: 1px solid #f0f0f0;
+}
+.nav-item-pro {
+    text-decoration: none;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+}
+.nav-item-pro i { font-size: 18px; }
+.nav-item-pro span { font-size: 11px; font-weight: bold; }
+
+.nav-item-pro.active { color: #e31e24; }
+.nav-item-pro.highlight { color: #ff9800; } /* لون برتقالي للعروض */
+
+/* تظبيط الهيرو عشان م يتغطاش */
+.hero {
+    margin-top: 155px !important; /* طول الهيدر الجديد */
+    height: 20vh !important;
+}
+
+.text-glow {
+    font-size: 1.5rem !important;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+/* أنيميشن للرقم */
+@keyframes pulse-red {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(227, 30, 36, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(227, 30, 36, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(227, 30, 36, 0); }
+}
+.pulse-red { animation: pulse-red 2s infinite; }
+
+/* إخفاء أي هيدرات قديمة */
+.top-nav, .top-nav-modern, .main-header { display: none !important; }/* 1. إخفاء كل المحاولات القديمة تماماً */
+.main-header, .top-nav, .top-nav-modern, .super-mobile-header, .karmasha-header {
+    display: none !important;
+}
+
+/* 2. تنسيق الهيدر الجديد */
+.new-karmasha-header {
+    background: #ffffff !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 99999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    font-family: 'Cairo', sans-serif;
+}
+
+.header-top-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.h-logo {
+    height: 45px;
+    width: auto;
+    display: block;
+}
+
+.h-login-btn {
+    background: #f0f0f0;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 18px;
+    color: #333;
+    cursor: pointer;
+}
+
+.h-call-btn {
+    background: #e31e24;
+    color: #fff !important;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* تنسيق الروابط */
+.header-links-row {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    background: #fff;
+}
+
+.h-link {
+    text-decoration: none;
+    color: #444 !important;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.h-link.active {
+    color: #e31e24 !important;
+    border-bottom: 2px solid #e31e24;
+}
+
+/* 3. تظبيط نزول باقي الصفحة */
+.hero, section, .buyer-nav {
+    margin-top: 105px !important; /* مسافة عشان الهيدر م يغطيش المحتوى */
+}
+
+/* تصحيح شريط الأقسام اللي تحت الهيرو */
+.buyer-nav.sticky-nav {
+    top: 105px !important;
+    margin-top: 0 !important;
 }
