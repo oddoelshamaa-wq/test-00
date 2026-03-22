@@ -8,268 +8,324 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
         :root { --main-red: #d2000a; --bg: #f8f9fa; }
-        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); color: #333; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); color: #333; overflow-x: hidden; }
 
-        /* تنسيق الهيدر الجديد */
-        .res-header-container { position: relative; background: #fff; padding-bottom: 20px; }
-        .res-banner { width: 100%; height: 200px; overflow: hidden; }
+        /* سترة التحميل */
+        #loader-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.6s cubic-bezier(0.77, 0, 0.175, 1); }
+        .loader-logo-container img { width: 150px; border-radius: 50%; animation: pulse-logo 1.5s infinite ease-in-out; }
+        @keyframes pulse-logo { 0%, 100% { transform: scale(0.9); } 50% { transform: scale(1.1); } }
+        .loaded #loader-wrapper { transform: translateY(-100%); }
+
+        /* الهيدر واللوجو */
+        .res-header-container { background: #fff; padding-bottom: 20px; text-align: center; }
+        .res-banner { width: 100%; height: 180px; overflow: hidden; }
         .res-banner img { width: 100%; height: 100%; object-fit: cover; }
+        .res-logo-circle { width: 90px; height: 90px; background: white; border-radius: 50%; margin: -45px auto 10px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 5px; perspective: 1000px; animation: rotate3D 8s linear infinite; }
+        .res-logo-circle img { width: 100%; height: 100%; border-radius: 50%; }
+        @keyframes rotate3D { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
 
-        .res-info-card { 
-            background: white; 
-            margin: -40px 15px 0; 
-            border-radius: 30px; 
-            position: relative; 
-            padding: 50px 15px 15px; 
-            text-align: center; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-        }
+        /* شريط البحث (ستايل الصورة) */
+        .search-container { padding: 10px 20px; position: sticky; top: 0; background: var(--bg); z-index: 100; }
+        .search-box { background: white; border-radius: 50px; display: flex; align-items: center; padding: 8px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .search-box input { border: none; outline: none; flex: 1; padding: 8px; font-family: 'Cairo'; font-size: 14px; }
 
-        .res-logo-circle {
-            position: absolute;
-            top: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 100px;
-            background: white;
-            border-radius: 50%;
-            padding: 5px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .res-logo-circle img { width: 90%; height: 90%; border-radius: 50%; object-fit: contain; }
+        /* شريط الأقسام الأفقي (ستايل الصورة) */
+        .horizontal-cats { display: flex; gap: 10px; overflow-x: auto; padding: 10px 20px; scrollbar-width: none; white-space: nowrap; }
+        .horizontal-cats::-webkit-scrollbar { display: none; }
+        .cat-pill { padding: 8px 20px; border-radius: 50px; background: white; border: 1.5px solid var(--main-red); color: var(--main-red); font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .cat-pill.active { background: var(--main-red); color: white; }
 
-        #display-name { font-size: 20px; font-weight: 900; margin: 10px 0 5px; color: #1a1a1a; }
-        .res-address { font-size: 13px; color: #777; margin: 5px 0; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .res-address i { color: var(--main-red); }
-        
-        .res-social-icons { margin-top: 15px; display: flex; justify-content: center; gap: 20px; color: #555; font-size: 18px; }
-        .header-top h1 { margin: 0; font-size: 32px; font-weight: 900; color: var(--main-red); letter-spacing: -1px; }
-        .header-top p { margin: 5px 0; font-size: 13px; color: #888; }
-
-        /* شريط البحث */
-        .search-container { padding: 15px 20px; }
-        .search-box { background: white; border-radius: 50px; display: flex; align-items: center; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .search-box input { border: none; outline: none; flex: 1; padding: 5px; font-family: 'Cairo'; }
-        .search-box i { color: #ccc; }
-
-        /* شبكة الأقسام المصورة (مثل الآغا) */
+        /* شبكة الأقسام */
         .categories-grid { padding: 10px 20px; display: grid; grid-template-columns: 1fr; gap: 15px; }
-        .category-card {
-            position: relative;
-            height: 150px;
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: 0.3s;
-        }
+        .category-card { position: relative; height: 130px; border-radius: 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; }
         .category-card img { position: absolute; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6); }
-        .category-card h2 { position: relative; color: white; font-size: 24px; font-weight: 900; z-index: 2; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .category-card:active { transform: scale(0.96); }
+        .category-card h2 { position: relative; color: white; font-size: 20px; font-weight: 900; z-index: 2; }
 
-        /* المنيو (يظهر عند اختيار قسم) */
-        #menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; overflow-y: auto; padding-bottom: 100px; }
-        .menu-header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .btn-back { font-size: 20px; color: var(--main-red); cursor: pointer; }
-
-        .product-item { background: white; margin: 10px 20px; border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-        .prod-details h3 { margin: 0; font-size: 16px; }
-        .prod-details p { margin: 5px 0; font-size: 12px; color: #777; }
+        /* المنيو والمنتجات */
+        #menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1001; overflow-y: auto; padding-bottom: 100px; }
+        .menu-header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .product-item { background: white; margin: 10px 15px; border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #f0f0f0; }
         .prod-price { color: var(--main-red); font-weight: bold; margin-top: 5px; }
+        .qty-controls { display: flex; align-items: center; gap: 12px; }
+        .btn-qty { background: var(--main-red); color: white; border: none; width: 28px; height: 28px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* السلة والتحكم */
-        .controls { display: flex; align-items: center; gap: 10px; }
-        .btn-add { background: var(--main-red); color: white; border: none; width: 30px; height: 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
-        .cart-float { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; background: var(--main-red); color: white; padding: 15px; border-radius: 15px; display: none; justify-content: space-between; align-items: center; font-weight: bold; box-shadow: 0 10px 30px rgba(210,0,10,0.3); z-index: 2000; }
+        /* السلة العائمة */
+        .cart-float { position: fixed; bottom: 20px; left: 5%; width: 90%; background: var(--main-red); color: white; padding: 16px; border-radius: 15px; display: none; justify-content: space-between; align-items: center; z-index: 2000; font-weight: bold; box-shadow: 0 8px 25px rgba(210, 0, 10, 0.3); }
+
+        /* مودال تأكيد الطلب (Checkout) */
+        #checkout-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; align-items: flex-end; }
+        .checkout-content { background: white; width: 100%; border-radius: 30px 30px 0 0; padding: 25px; box-sizing: border-box; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .checkout-content h3 { margin-top: 0; color: var(--main-red); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Cairo'; box-sizing: border-box; }
+        .btn-confirm { background: #25d366; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
     </style>
 </head>
 <body>
 
-<!-- الهيدر المطور (Karmasha Style) -->
+<!-- سترة التحميل -->
+<div id="loader-wrapper">
+    <div class="loader-logo-container"><img src="5515928d-da81-433e-8bc9-245180ba6724.jpg"></div>
+    <div class="loading-bar"></div>
+</div>
+
+<!-- الهيدر -->
 <div class="res-header-container">
-    <div class="res-banner">
-        <img id="display-banner" src="https://via.placeholder.com/800x400" alt="Banner">
-    </div>
-    
-    <div class="res-info-card">
-        <div class="res-logo-circle">
-            <img id="display-logo" src="5515928d-da81-433e-8bc9-245180ba6724.jpg" alt="Logo">
-        </div>
-        
-        <h1 id="display-name">Karmasha - Restaurant - مجموعة مطاعم قرمشة</h1>
-        
-        <p class="res-address">
-            <i class="fas fa-map-marker-alt"></i> 
-            <span id="display-address">العنوان -</span>
-        </p>
-<div class="res-social-icons">
-    <!-- رابط تيك توك -->
-    <a href="https://www.tiktok.com/@your_username" target="_blank">
-        <i class="fab fa-tiktok"></i>
-    </a>
-    
-    <!-- رابط فيسبوك -->
-    <a href="https://www.facebook.com/your_page" target="_blank">
-        <i class="fab fa-facebook"></i>
-    </a>
-    
-    <!-- رابط انستجرام -->
-    <a href="https://www.instagram.com/your_profile" target="_blank">
-        <i class="fab fa-instagram"></i>
-    </a>
+    <div class="res-banner"><img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800"></div>
+    <div class="res-logo-circle"><img src="5515928d-da81-433e-8bc9-245180ba6724.jpg"></div>
+    <h2 id="display-name" style="margin:0">قرمشة - Karmasha</h2>
+    <p style="font-size: 12px; color: #777;"><i class="fas fa-map-marker-alt"></i> الطعم الأصلي للقرمشة</p>
 </div>
+
+<!-- البحث -->
+<div class="search-container">
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="ابحث عن وجبتك المفضلة..." oninput="handleSearch()">
+        <i class="fas fa-search" style="color: #ccc;"></i>
     </div>
 </div>
 
-    <div class="search-container">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" placeholder="ابحث عن وجبتك المفضلة...">
+<!-- شريط الأقسام الأفقي -->
+<div class="horizontal-cats" id="horizontal-cats">
+    <div class="cat-pill active" onclick="filterByCat('الكل')">الكل</div>
+    <!-- سيتم تعبئته برمجياً -->
+</div>
+
+<!-- شبكة الأقسام الرئيسية -->
+<div class="categories-grid" id="main-categories"></div>
+
+<!-- واجهة المنيو -->
+<div id="menu-overlay">
+    <div class="menu-header">
+        <i class="fas fa-arrow-right btn-back" onclick="goBack()"></i>
+        <h2 id="current-view-title" style="margin:0; font-size:18px;"></h2>
+    </div>
+    <div id="menu-content"></div>
+</div>
+
+<!-- السلة العائمة -->
+<div class="cart-float" id="cart-float" onclick="openCheckoutModal()">
+    <span>إتمام الطلب <i class="fas fa-shopping-basket"></i></span>
+    <span id="cart-total">0 ج.م</span>
+</div>
+
+<!-- مودال تأكيد البيانات (Checkout) -->
+<div id="checkout-modal" onclick="if(event.target==this) closeCheckout()">
+    <div class="checkout-content">
+        <h3>بيانات التوصيل 🛵</h3>
+        <div class="form-group">
+            <label>الاسم الكامل</label>
+            <input type="text" id="cust-name" placeholder="اكتب اسمك هنا">
         </div>
-    </div>
-
-    <!-- شبكة الأقسام المصورة -->
-    <div class="categories-grid" id="categories-list">
-        <!-- سيتم تحميلها من فايربيز (الصور والأسماء) -->
-    </div>
-
-    <!-- واجهة المنيو (تفتح عند الضغط على قسم) -->
-    <div id="menu-overlay">
-        <div class="menu-header">
-            <i class="fas fa-arrow-right btn-back" onclick="closeMenu()"></i>
-            <h2 id="current-cat-name" style="margin:0; font-size:18px;"></h2>
+        <div class="form-group">
+            <label>رقم الموبايل</label>
+            <input type="tel" id="cust-phone" placeholder="01xxxxxxxxx">
         </div>
-        <div id="products-container"></div>
+        <div class="form-group">
+            <label>العنوان بالتفصيل</label>
+            <textarea id="cust-address" rows="2" placeholder="المنطقة، الشارع، رقم العمارة"></textarea>
+        </div>
+        <div class="form-group">
+            <label>علامة مميزة (اختياري)</label>
+            <input type="text" id="cust-landmark" placeholder="بجوار صيدلية كذا...">
+        </div>
+        <button class="btn-confirm" onclick="sendToWhatsApp()">
+            تأكيد الطلب عبر الواتساب <i class="fab fa-whatsapp"></i>
+        </button>
     </div>
+</div>
 
-    <!-- سلة الطلبات -->
-    <div class="cart-float" id="cart-float" onclick="openCheckout()">
-        <span>أظهر طلبي</span>
-        <span id="cart-total">0 ج.م</span>
-    </div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyClhjCiMrdiFP4oGYktlLKBHP2Rtbj9ezQ",
+        authDomain: "karmasha-2b4c6.firebaseapp.com",
+        projectId: "karmasha-2b4c6",
+        storageBucket: "karmasha-2b4c6.firebasestorage.app",
+        messagingSenderId: "759041608172",
+        appId: "1:759041608172:web:48556eda517d508e1e98c9"
+    };
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyClhjCiMrdiFP4oGYktlLKBHP2Rtbj9ezQ",
-            authDomain: "karmasha-2b4c6.firebaseapp.com",
-            projectId: "karmasha-2b4c6",
-            storageBucket: "karmasha-2b4c6.firebasestorage.app",
-            messagingSenderId: "759041608172",
-            appId: "1:759041608172:web:48556eda517d508e1e98c9"
-        };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    let allCategories = [];
+    let allProducts = [];
+    let cart = {};
+    let navigationHistory = [];
 
-        let cart = {};
-        let allProducts = [];
+    async function initData() {
+        const catSnap = await getDocs(collection(db, "categories"));
+        allCategories = catSnap.docs.map(d => ({id: d.id, ...d.data()}));
+        const prodSnap = await getDocs(collection(db, "products"));
+        allProducts = prodSnap.docs.map(d => ({id: d.id, ...d.data()}));
 
-        // تحميل الأقسام المصورة
-        onSnapshot(query(collection(db, "categories"), orderBy("createdAt", "asc")), (snap) => {
-            const list = document.getElementById('categories-list');
-            list.innerHTML = '';
-            snap.forEach(doc => {
-                const cat = doc.data();
-                // إذا لم توجد صورة للقسم، نستخدم صورة افتراضية
-                const catImg = cat.img || 'https://via.placeholder.com/400x200?text=Karmasha';
-                list.innerHTML += `
-                    <div class="category-card" onclick="openMenu('${cat.name}')">
-                        <img src="${catImg}">
-                        <h2>${cat.name}</h2>
-                    </div>
-                `;
-            });
+        renderHorizontalCats();
+        renderHome();
+        document.body.classList.add('loaded');
+    }
+
+    // عرض شريط الأقسام الأفقي
+    function renderHorizontalCats() {
+        const bar = document.getElementById('horizontal-cats');
+        const mainCats = allCategories.filter(c => !c.parent);
+        mainCats.forEach(cat => {
+            const pill = document.createElement('div');
+            pill.className = 'cat-pill';
+            pill.innerText = cat.name;
+            pill.onclick = () => {
+                document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                navigateTo(cat.name);
+            };
+            bar.appendChild(pill);
         });
+    }
 
-        // جلب المنتجات
-        async function loadProds() {
-            const snap = await getDocs(collection(db, "products"));
-            allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    function renderHome() {
+        const list = document.getElementById('main-categories');
+        const mainCats = allCategories.filter(c => !c.parent);
+        list.innerHTML = mainCats.map(cat => `
+            <div class="category-card" onclick="navigateTo('${cat.name}')">
+                <img src="${cat.img || 'https://via.placeholder.com/400x200'}">
+                <h2>${cat.name}</h2>
+            </div>
+        `).join('');
+    }
+
+    window.handleSearch = () => {
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        if(term.length > 0) {
+            document.getElementById('current-view-title').innerText = "نتائج البحث عن: " + term;
+            const container = document.getElementById('menu-content');
+            container.innerHTML = '';
+            document.getElementById('menu-overlay').style.display = 'block';
+            
+            const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term));
+            renderProductList(filtered, container);
+        } else {
+            goBack();
+        }
+    };
+
+    window.navigateTo = (catName) => {
+        navigationHistory.push(catName);
+        renderMenu(catName);
+    };
+
+    window.goBack = () => {
+        navigationHistory.pop();
+        if (navigationHistory.length === 0) {
+            document.getElementById('menu-overlay').style.display = 'none';
+        } else {
+            renderMenu(navigationHistory[navigationHistory.length - 1]);
+        }
+    };
+
+    function renderMenu(catName) {
+        document.getElementById('current-view-title').innerText = catName;
+        const container = document.getElementById('menu-content');
+        container.innerHTML = '';
+        document.getElementById('menu-overlay').style.display = 'block';
+
+        const subCats = allCategories.filter(c => c.parent === catName);
+        if (subCats.length > 0) {
+            container.innerHTML = `<div class="categories-grid">` + subCats.map(sc => `
+                <div class="category-card" onclick="navigateTo('${sc.name}')">
+                    <img src="${sc.img || 'https://via.placeholder.com/400x200'}">
+                    <h2>${sc.name}</h2>
+                </div>
+            `).join('') + `</div>`;
+        } else {
+            const prods = allProducts.filter(p => p.category === catName);
+            renderProductList(prods, container);
+        }
+    }
+
+    function renderProductList(prods, container) {
+        container.innerHTML = prods.map(p => {
+            const qty = cart[p.id] ? cart[p.id].qty : 0;
+            return `
+                <div class="product-item">
+                    <div>
+                        <h3 style="margin:0; font-size:16px;">${p.name}</h3>
+                        <div class="prod-price">${p.prices[0].price} ج.م</div>
+                    </div>
+                    <div class="qty-controls">
+                        ${qty > 0 ? `<button class="btn-qty" onclick="updateQty('${p.id}', -1)">-</button> <span style="font-weight:900">${qty}</span>` : ''}
+                        <button class="btn-qty" onclick="updateQty('${p.id}', 1)">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.updateQty = (id, delta) => {
+        const p = allProducts.find(x => x.id === id);
+        if (!cart[id]) cart[id] = { name: p.name, price: p.prices[0].price, qty: 0 };
+        cart[id].qty += delta;
+        if (cart[id].qty <= 0) delete cart[id];
+        
+        let total = 0;
+        for (let k in cart) total += cart[k].price * cart[k].qty;
+        document.getElementById('cart-total').innerText = total + " ج.م";
+        document.getElementById('cart-float').style.display = total > 0 ? 'flex' : 'none';
+        
+        const currentTitle = document.getElementById('current-view-title').innerText;
+        if(currentTitle.includes("نتائج البحث")) handleSearch(); else renderMenu(navigationHistory[navigationHistory.length - 1]);
+    };
+
+    // وظائف الواتساب والتشيك أوت
+    window.openCheckoutModal = () => {
+        document.getElementById('checkout-modal').style.display = 'flex';
+    };
+
+    window.closeCheckout = () => {
+        document.getElementById('checkout-modal').style.display = 'none';
+    };
+
+    window.sendToWhatsApp = () => {
+        const name = document.getElementById('cust-name').value;
+        const phone = document.getElementById('cust-phone').value;
+        const address = document.getElementById('cust-address').value;
+        const landmark = document.getElementById('cust-landmark').value;
+
+        if(!name || !phone || !address) {
+            alert("من فضلك كمل بياناتك (الاسم، الموبايل، العنوان)");
+            return;
         }
 
-        window.openMenu = (catName) => {
-            document.getElementById('current-cat-name').innerText = catName;
-            const container = document.getElementById('products-container');
-            container.innerHTML = '';
-            
-            const filtered = allProducts.filter(p => p.category === catName);
-            filtered.forEach(p => {
-                const qty = cart[p.id] ? cart[p.id].qty : 0;
-                container.innerHTML += `
-                    <div class="product-item">
-                        <div class="prod-details">
-                            <h3>${p.name}</h3>
-                            <p>${p.description || ''}</p>
-                            <div class="prod-price">${p.prices[0].price} ج.م</div>
-                        </div>
-                        <div class="controls">
-                            ${qty > 0 ? `<span onclick="updateQty('${p.id}', -1)">-</span> <b>${qty}</b>` : ''}
-                            <button class="btn-add" onclick="updateQty('${p.id}', 1)">+</button>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('menu-overlay').style.display = 'block';
-        };
+        let orderText = `*طلب جديد من مطعم قرمشة 🍗*%0A%0A`;
+        orderText += `*الاسم:* ${name}%0A`;
+        orderText += `*الموبايل:* ${phone}%0A`;
+        orderText += `*العنوان:* ${address}%0A`;
+        if(landmark) orderText += `*علامة مميزة:* ${landmark}%0A`;
+        orderText += `%0A*--- الطلبات ---*%0A`;
 
-        window.closeMenu = () => document.getElementById('menu-overlay').style.display = 'none';
+        let total = 0;
+        for(let id in cart) {
+            const item = cart[id];
+            orderText += `• ${item.name} (${item.qty}) = ${item.price * item.qty}ج%0A`;
+            total += item.price * item.qty;
+        }
 
-        window.updateQty = (id, delta) => {
-            if(!cart[id]) {
-                const p = allProducts.find(x => x.id === id);
-                cart[id] = { name: p.name, price: p.prices[0].price, qty: 0 };
-            }
-            cart[id].qty += delta;
-            if(cart[id].qty <= 0) delete cart[id];
-            
-            let total = 0;
-            for(let key in cart) total += cart[key].price * cart[key].qty;
-            
-            document.getElementById('cart-total').innerText = total + " ج.م";
-            document.getElementById('cart-float').style.display = total > 0 ? 'flex' : 'none';
-            openMenu(document.getElementById('current-cat-name').innerText);
-        };
+        orderText += `%0A*الإجمالي الكلي: ${total} ج.م*%0A%0A_شكراً لاختياركم قرمشة!_`;
 
-        window.openCheckout = () => {
-            const name = prompt("الاسم:");
-            const phone = prompt("الموبايل:");
-            const addr = prompt("العنوان:");
-            if(!name || !phone || !addr) return;
+        const waNumber = "201122884885";
+        window.open(`https://wa.me/${waNumber}?text=${orderText}`, '_blank');
+        
+        // إعادة ضبط السلة بعد الطلب
+        cart = {};
+        document.getElementById('cart-float').style.display = 'none';
+        closeCheckout();
+    };
 
-            let total = 0, msg = `*طلب جديد من قرمشة*%0Aالاسم: ${name}%0Aالعنوان: ${addr}%0A---%0A`;
-            let itemsArr = [];
+    initData();
+</script>
 
-            for(let id in cart) {
-                const item = cart[id];
-                total += item.price * item.qty;
-                itemsArr.push({name: item.name, qty: item.qty, price: item.price});
-                msg += `• ${item.name} (x${item.qty}) = ${item.price * item.qty}ج%0A`;
-            }
-            msg += `---%0Aالإجمالي: ${total} ج.م`;
-
-            // إرسال لفايربيز
-            addDoc(collection(db, "orders"), {
-                customerName: name, customerPhone: phone, customerAddress: addr,
-                items: itemsArr, totalPrice: total, status: "جديد", createdAt: serverTimestamp()
-            });
-
-            // فتح الواتساب
-            window.open(`https://wa.me/201122884885?text=${msg}`);
-            location.reload();
-        };
-
-        loadProds();
-    </script>
 </body>
 </html>
