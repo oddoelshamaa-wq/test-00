@@ -3,959 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karmasha - قرمشة | عالم الفرايد تشيكن</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Karmasha - قرمشة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- إضافة خط كايرو الاحترافي -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
+        :root { --main-red: #d2000a; --bg: #f8f9fa; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; background: var(--bg); color: #333; }
+
+        /* تنسيق الهيدر الجديد */
+        .res-header-container { position: relative; background: #fff; padding-bottom: 20px; }
+        .res-banner { width: 100%; height: 200px; overflow: hidden; }
+        .res-banner img { width: 100%; height: 100%; object-fit: cover; }
+
+        .res-info-card { 
+            background: white; 
+            margin: -40px 15px 0; 
+            border-radius: 30px; 
+            position: relative; 
+            padding: 50px 15px 15px; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+
+        .res-logo-circle {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .res-logo-circle img { width: 90%; height: 90%; border-radius: 50%; object-fit: contain; }
+
+        #display-name { font-size: 20px; font-weight: 900; margin: 10px 0 5px; color: #1a1a1a; }
+        .res-address { font-size: 13px; color: #777; margin: 5px 0; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .res-address i { color: var(--main-red); }
+        
+        .res-social-icons { margin-top: 15px; display: flex; justify-content: center; gap: 20px; color: #555; font-size: 18px; }
+        .header-top h1 { margin: 0; font-size: 32px; font-weight: 900; color: var(--main-red); letter-spacing: -1px; }
+        .header-top p { margin: 5px 0; font-size: 13px; color: #888; }
+
+        /* شريط البحث */
+        .search-container { padding: 15px 20px; }
+        .search-box { background: white; border-radius: 50px; display: flex; align-items: center; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .search-box input { border: none; outline: none; flex: 1; padding: 5px; font-family: 'Cairo'; }
+        .search-box i { color: #ccc; }
+
+        /* شبكة الأقسام المصورة (مثل الآغا) */
+        .categories-grid { padding: 10px 20px; display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .category-card {
+            position: relative;
+            height: 150px;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+        .category-card img { position: absolute; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.6); }
+        .category-card h2 { position: relative; color: white; font-size: 24px; font-weight: 900; z-index: 2; margin: 0; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+        .category-card:active { transform: scale(0.96); }
+
+        /* المنيو (يظهر عند اختيار قسم) */
+        #menu-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 1000; overflow-y: auto; padding-bottom: 100px; }
+        .menu-header { background: white; padding: 15px 20px; display: flex; align-items: center; gap: 15px; sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .btn-back { font-size: 20px; color: var(--main-red); cursor: pointer; }
+
+        .product-item { background: white; margin: 10px 20px; border-radius: 15px; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+        .prod-details h3 { margin: 0; font-size: 16px; }
+        .prod-details p { margin: 5px 0; font-size: 12px; color: #777; }
+        .prod-price { color: var(--main-red); font-weight: bold; margin-top: 5px; }
+
+        /* السلة والتحكم */
+        .controls { display: flex; align-items: center; gap: 10px; }
+        .btn-add { background: var(--main-red); color: white; border: none; width: 30px; height: 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        .cart-float { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; background: var(--main-red); color: white; padding: 15px; border-radius: 15px; display: none; justify-content: space-between; align-items: center; font-weight: bold; box-shadow: 0 10px 30px rgba(210,0,10,0.3); z-index: 2000; }
+    </style>
 </head>
 <body>
 
-    <!-- Loading Screen (خدعة بصرية لأول ثانية) -->
-    <div id="loader" class="loader-wrapper">
-        <div class="loader-content">
-            <img src="5515928d-da81-433e-8bc9-245180ba6724.jpg" class="loading-logo">
-            <div class="progress-bar"></div>
+<!-- الهيدر المطور (Karmasha Style) -->
+<div class="res-header-container">
+    <div class="res-banner">
+        <img id="display-banner" src="https://via.placeholder.com/800x400" alt="Banner">
+    </div>
+    
+    <div class="res-info-card">
+        <div class="res-logo-circle">
+            <img id="display-logo" src="5515928d-da81-433e-8bc9-245180ba6724.jpg" alt="Logo">
+        </div>
+        
+        <h1 id="display-name">Karmasha - Restaurant - مجموعة مطاعم قرمشة</h1>
+        
+        <p class="res-address">
+            <i class="fas fa-map-marker-alt"></i> 
+            <span id="display-address">العنوان -</span>
+        </p>
+<div class="res-social-icons">
+    <!-- رابط تيك توك -->
+    <a href="https://www.tiktok.com/@your_username" target="_blank">
+        <i class="fab fa-tiktok"></i>
+    </a>
+    
+    <!-- رابط فيسبوك -->
+    <a href="https://www.facebook.com/your_page" target="_blank">
+        <i class="fab fa-facebook"></i>
+    </a>
+    
+    <!-- رابط انستجرام -->
+    <a href="https://www.instagram.com/your_profile" target="_blank">
+        <i class="fab fa-instagram"></i>
+    </a>
+</div>
+    </div>
+</div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="ابحث عن وجبتك المفضلة...">
         </div>
     </div>
 
-    <header class="main-header">
-        <div class="container logo-container">
-            <img src="5515928d-da81-433e-8bc9-245180ba6724.jpg" alt="Karmasha Logo" class="site-logo floating">
-        </div>
-    </header>
-<!-- هيدر قرمشة الجديد - نسخة الموبايل الاحترافية -->
-<header class="new-karmasha-header">
-    <div class="header-top-line">
-        <!-- زر الدخول -->
-        <div class="h-item">
-            <button onclick="openAuthModal()" class="h-login-btn">
-                <i class="fas fa-user"></i>
-            </button>
-        </div>
-
-        <!-- اللوجو في النص -->
-        <div class="h-item">
-            <img src="5515928d-da81-433e-8bc9-245180ba6724.jpg" class="h-logo" alt="Karmasha">
-        </div>
-
-        <!-- زر الاتصال -->
-        <div class="h-item">
-            <a href="tel:19218" class="h-call-btn">
-                <i class="fas fa-phone-alt"></i>
-                <span>19218</span>
-            </a>
-        </div>
+    <!-- شبكة الأقسام المصورة -->
+    <div class="categories-grid" id="categories-list">
+        <!-- سيتم تحميلها من فايربيز (الصور والأسماء) -->
     </div>
 
-    <!-- روابط التنقل السريعة -->
-    <div class="header-links-row">
-        <a href="#" class="h-link active">الرئيسية</a>
-        <a href="#menu" class="h-link">المنيو</a>
-        <a href="#" class="h-link">الفروع</a>
-        <a href="#" class="h-link">العروض</a>
-    </div>
-</header>
-
-    <section class="hero paralllax">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1 class="text-glow">KARMASHA</h1>
-           
+    <!-- واجهة المنيو (تفتح عند الضغط على قسم) -->
+    <div id="menu-overlay">
+        <div class="menu-header">
+            <i class="fas fa-arrow-right btn-back" onclick="closeMenu()"></i>
+            <h2 id="current-cat-name" style="margin:0; font-size:18px;"></h2>
         </div>
-    </section>
-
-    <!-- شريط التنقل للأقسام -->
-    <nav class="buyer-nav sticky-nav">
-        <div class="nav-container" id="dynamicCategories"></div>
-    </nav>
-
-    <div id="productsContainer" class="container"></div>
-
-    <!-- مودال التسجيل (تأثير Glassmorphism) -->
-    <div id="auth-modal" class="modal blur-bg">
-        <div class="modal-flex-container animate-pop">
-            <!-- النص الشمال: اللوجو وصورة جذابة -->
-            <div class="modal-image-side">
-                 <img src="5515928d-da81-433e-8bc9-245180ba6724.jpg" class="side-logo-img">
-                 <div class="side-text">
-                     <h2>KARMASHA</h2>
-                     <p>أقوى قرمشة في مصر</p>
-                 </div>
-            </div>
-
-            <!-- النص اليمين: الفورم -->
-            <div class="modal-form-side">
-                <span class="close-modal" onclick="closeAuthModal()">&times;</span>
-                <div id="login-form">
-                    <h3 class="modal-title">تسجيل الدخول</h3>
-                    <div class="input-group">
-                        <i class="fas fa-mobile-alt"></i>
-                        <input type="tel" id="login-phone" placeholder="رقم الموبايل">
-                    </div>
-                    <div class="input-group">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="login-pass" placeholder="كلمة المرور">
-                    </div>
-                    <button onclick="login()" class="btn-auth shine-btn">دخول</button>
-                    <p class="switch-text">معندكش حساب؟ <a href="javascript:void(0)" onclick="toggleAuth('reg')">سجل الآن</a></p>
-                </div>
-
-                <div id="register-form" style="display:none;">
-                    <h3 class="modal-title">عضوية جديدة 🍗</h3>
-                    <div class="input-group"><i class="fas fa-user"></i><input type="text" id="reg-name" placeholder="الاسم"></div>
-                    <div class="input-group"><i class="fas fa-mobile-alt"></i><input type="tel" id="reg-phone" placeholder="رقم الموبايل"></div>
-                    <div class="input-group"><i class="fas fa-key"></i><input type="password" id="reg-pass" placeholder="باسورد قوي"></div>
-                    <button onclick="register()" class="btn-auth">إنشاء حساب</button>
-                    <p class="switch-text">عندك حساب؟ <a href="javascript:void(0)" onclick="toggleAuth('login')">دخول</a></p>
-                </div>
-            </div>
-        </div>
+        <div id="products-container"></div>
     </div>
 
-    <!-- مودال تفاصيل المنتج -->
-    <div id="product-modal" class="modal blur-bg">
-        <div class="product-details-container animate-pop">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-
-            <div class="product-flex">
-                <!-- جانب الصورة -->
-                <div class="product-main-img">
-                    <img id="modal-img" src="" alt="">
-                </div>
-
-                <!-- جانب المعلومات -->
-                <div class="product-main-info">
-                    <h2 id="modal-name">اسم الوجبة</h2>
-                    <p id="modal-desc" class="product-description">وصف الوجبة بالتفصيل هنا...</p>
-
-                    <div id="price-options-container" class="price-options">
-                        <!-- الخيارات هتنزل هنا بالـ JS -->
-                    </div>
-
-                    <div class="modal-actions">
-                        <button id="modal-add-btn" class="add-to-cart-btn-large">
-                            أضف للسلة <span id="modal-price-display">0</span> ج.م
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- سلة الطلبات -->
+    <div class="cart-float" id="cart-float" onclick="openCheckout()">
+        <span>أظهر طلبي</span>
+        <span id="cart-total">0 ج.م</span>
     </div>
 
-    <!-- مودال البروفايل الشخصي -->
-    <div id="profile-modal" class="modal blur-bg">
-        <div class="modal-content glass-card animate-pop">
-            <span class="close" onclick="toggleProfileModal()">&times;</span>
-            <div class="profile-header">
-                <div class="user-avatar-big">
-                    <i class="fas fa-user-check"></i>
-                </div>
-                <h3 id="profile-name-title">محمود</h3>
-                <p id="profile-phone-detail">01122884885</p>
-            </div>
-            
-            <div class="profile-body">
-                <h4><i class="fas fa-history"></i> طلباتك الأخيرة</h4>
-                <div id="user-orders-list" class="user-orders-mini-list">
-                    <p class="loading-text">جاري تحميل طلباتك...</p>
-                </div>
-            </div>
-            
-            <button onclick="logout()" class="btn-logout">
-                <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-            </button>
-        </div>
-    </div>
-
-    <!-- أيقونة السلة المتطورة -->
-    <div class="cart-toggle ripple" onclick="toggleCart()">
-        <i class="fas fa-shopping-basket"></i>
-        <span id="cart-count">0</span>
-    </div>
-
-    <!-- تحميل مكتبات فايربيز الأساسية -->
     <script type="module">
-      // استيراد الدوال اللي محتاجينها
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, query, where, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-      import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-      // بيانات مشروعك (اللي إنت بعتها)
-      const firebaseConfig = {
-        apiKey: "AIzaSyArc3Y--aq-6e8omAbcpm8fZ5BvNcYMtkw",
-        authDomain: "karmasha-bfad3.firebaseapp.com",
-        projectId: "karmasha-bfad3",
-        storageBucket: "karmasha-bfad3.firebasestorage.app",
-        messagingSenderId: "584846393500",
-        appId: "1:584846393500:web:5a58f969f3a66126026d59",
-        measurementId: "G-G518D7LXSS"
-      };
+        const firebaseConfig = {
+            apiKey: "AIzaSyClhjCiMrdiFP4oGYktlLKBHP2Rtbj9ezQ",
+            authDomain: "karmasha-2b4c6.firebaseapp.com",
+            projectId: "karmasha-2b4c6",
+            storageBucket: "karmasha-2b4c6.firebasestorage.app",
+            messagingSenderId: "759041608172",
+            appId: "1:759041608172:web:48556eda517d508e1e98c9"
+        };
 
-      // تشغيل فايربيز
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      const auth = getAuth(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-      // تصدير الأدوات عشان نستخدمها في باقي الكود
-      window.db = db;
-      window.auth = auth;
-      window.initializeApp = initializeApp;
-      window.getFirestore = getFirestore;
-      window.collection = collection;
-      window.addDoc = addDoc;
-      window.getDocs = getDocs;
-      window.onSnapshot = onSnapshot;
-      window.doc = doc;
-      window.updateDoc = updateDoc;
-      window.deleteDoc = deleteDoc;
-      window.serverTimestamp = serverTimestamp;
-      window.query = query;
-      window.where = where;
-      window.orderBy = orderBy;
-      window.setDoc = setDoc;
-      window.getAuth = getAuth;
-      window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-      window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-      window.onAuthStateChanged = onAuthStateChanged;
-      window.signOut = signOut;
-    </script>
+        let cart = {};
+        let allProducts = [];
 
-    <!-- السكريبت (نفس الوظائف السابقة مع تحسين الحركة) -->
-    <script>
-        // خدعة الـ Loader
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loader').style.opacity = '0';
-                setTimeout(() => document.getElementById('loader').style.display = 'none', 500);
-            }, 1000);
+        // تحميل الأقسام المصورة
+        onSnapshot(query(collection(db, "categories"), orderBy("createdAt", "asc")), (snap) => {
+            const list = document.getElementById('categories-list');
+            list.innerHTML = '';
+            snap.forEach(doc => {
+                const cat = doc.data();
+                // إذا لم توجد صورة للقسم، نستخدم صورة افتراضية
+                const catImg = cat.img || 'https://via.placeholder.com/400x200?text=Karmasha';
+                list.innerHTML += `
+                    <div class="category-card" onclick="openMenu('${cat.name}')">
+                        <img src="${catImg}">
+                        <h2>${cat.name}</h2>
+                    </div>
+                `;
+            });
         });
 
-        // دوال المودال مع الأنيميشن
-        function openAuthModal() { 
-            const modal = document.getElementById('auth-modal');
-            modal.style.display = 'flex';
-        }
-        function closeAuthModal() { 
-            document.getElementById('auth-modal').style.display = 'none'; 
+        // جلب المنتجات
+        async function loadProds() {
+            const snap = await getDocs(collection(db, "products"));
+            allProducts = snap.docs.map(d => ({id: d.id, ...d.data()}));
         }
 
-        // التبديل بين دخول وتسجيل
-        function toggleAuth(type) {
-            if (type === 'reg') {
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('register-form').style.display = 'block';
-            } else {
-                document.getElementById('login-form').style.display = 'block';
-                document.getElementById('register-form').style.display = 'none';
-            }
-        }
-
-        // إغلاق المودال لو ضغطت في أي مكان بره الصندوق الأبيض
-        window.onclick = function(event) {
-            let modal = document.getElementById('auth-modal');
-            if (event.target == modal) {
-                closeAuthModal();
-            }
-        }
-
-        // Initialize default products if none exist
-        if (!localStorage.getItem('products')) {
-            const defaultProducts = [
-                { name: 'وجبة تشيكن صغير (3 قطع)', price: '140', description: '3 قطع فرايد تشيكن + عيش + كول سلو + بطاطس', category: 'فرايد تشيكن' },
-                { name: 'وجبة مسحب عادي', price: '175', description: '7 قطع مسحب + بطاطس + كول سلو', category: 'وجبات مسحب' },
-                { name: 'وجبة ستربس وسط', price: '150', description: '5 قطع ستربس + عيش + بطاطس', category: 'تشيكن ستربس' }
-            ];
-            localStorage.setItem('products', JSON.stringify(defaultProducts));
-        }
-
-        // Setup logger
-        function setup_logger() {
-            return {
-                info: function(message) {
-                    console.log('[INFO]', message);
-                }
-            };
-        }
-
-        // دالة للتبديل بين الأقسام وتلوين الزر المختار
-        function selectCategory(element, catName) {
-            // إزالة اللون الأحمر من كل الأزرار
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            // إضافة اللون الأحمر للزر الذي ضغطت عليه
-            element.classList.add('active');
-            // عرض المنتجات
-            renderProductsForCategory(catName);
-        }
-
-        // دالة عرض المنتجات لقسم معين
-        function renderProductsForCategory(c) {
-            const container = document.getElementById('productsContainer');
+        window.openMenu = (catName) => {
+            document.getElementById('current-cat-name').innerText = catName;
+            const container = document.getElementById('products-container');
             container.innerHTML = '';
-
-            // إصلاح 1: التأكد إن المنتجات اتحملت أصلاً
-            if(!window.allProducts) {
-                container.innerHTML = '<div style="text-align:center; padding:20px;">جاري تحميل المنتجات...</div>';
-                return;
-            }
-
-            const fil = window.allProducts.filter(p => p.category == c);
-
-            if(!fil.length) {
-                container.innerHTML='<p style="text-align:center; padding:20px;">لا توجد منتجات في هذا القسم حالياً</p>';
-                return;
-            }
-
-            const grid = document.createElement('div');
-            grid.className='products-grid';
-
-            fil.forEach(p => {
-                // إصلاح 2 (سبب المشكلة): التأكد إن المنتج له سعر وصورة قبل العرض
-                const price = (p.prices && p.prices.length > 0) ? p.prices[0].price : 'غير محدد';
-                const imgSrc = p.img ? p.img : 'https://via.placeholder.com/150';
-
-                const pStr = encodeURIComponent(JSON.stringify(p));
-
-                grid.innerHTML+=`
-                <div class="food-card" onclick="openModal('${pStr}')">
-                    <div class="food-image">
-                        <img src="${imgSrc}" onerror="this.src='https://via.placeholder.com/150'">
-                    </div>
-                    <div class="food-details">
-                        <h3>${p.name}</h3>
-                        <span class="price-tag">${price} ج</span>
-                        <button class="view-btn">اطلب</button>
-                    </div>
-                </div>`;
-            });
-            container.appendChild(grid);
-        }
-
-        // Open product modal
-        function openModal(pStr) {
-            const product = JSON.parse(decodeURIComponent(pStr));
-
-            if (product) {
-                document.getElementById('modal-name').innerText = product.name;
-                document.getElementById('modal-desc').innerText = product.description;
-                document.getElementById('modal-img').src = product.img;
-
-                const optionsDiv = document.getElementById('price-options-container');
-                optionsDiv.innerHTML = ""; // مسح القديم عشان ميظهرش مكرر
-
-                // هنا السر: بنلف على كل الأحجام اللي إنت ضفتها في الأدمن
-                product.prices.forEach((item, index) => {
-                    optionsDiv.innerHTML += `
-                        <label class="size-option" style="display: block; margin-bottom: 10px; border: 1px solid #ddd; padding: 10px; border-radius: 8px; cursor: pointer;">
-                            <input type="radio" name="meal-size" value="${item.price}"
-                                   data-size="${item.size}" ${index === 0 ? 'checked' : ''}
-                                   onchange="updateModalPrice(this.value)" style="margin-left: 10px;">
-                            <span>${item.size} (${item.price} ج.م)</span>
-                        </label>
-                    `;
-                });
-
-                // تحديث السعر الابتدائي في الزرار
-                updateModalPrice(product.prices[0].price);
-
-                // برمجة زرار "أضف للسلة"
-                document.getElementById('modal-add-btn').onclick = () => {
-                    const selected = document.querySelector('input[name="meal-size"]:checked');
-                    const finalName = `${product.name} - الحجم: ${selected.getAttribute('data-size')}`;
-                    addToCart(finalName, parseInt(selected.value));
-                    closeModal();
-                };
-
-                document.getElementById('product-modal').style.display = 'flex';
-            }
-        }
-
-        // دالة لتحديث السعر المكتوب جوه الزرار الأحمر
-        function updateModalPrice(price) {
-            document.getElementById('modal-price-display').innerText = price;
-        }
-
-        // Close product modal
-        function closeModal() {
-            document.getElementById('product-modal').style.display = 'none';
-        }
-
-        // دالة لتحميل الأقسام في الشريط العلوي (تحت الهيرو)
-        function loadCategories() {
-            const navContainer = document.getElementById('dynamicCategories');
-            // جلب الأقسام من المفتاح الموحد
-            let savedCategories = JSON.parse(localStorage.getItem('karmashaCategories')) || ["فرايد تشيكن", "تشيكن ستربس"];
-
-            navContainer.innerHTML = "";
-            savedCategories.forEach((cat, index) => {
-                // جعل أول قسم نشط افتراضياً
-                let activeClass = (index === 0) ? "active" : "";
-                navContainer.innerHTML += `
-                    <a href="javascript:void(0)" onclick="selectCategory(this, '${cat}')" class="nav-item ${activeClass}">
-                        ${cat}
-                    </a>
-                `;
-            });
-
-            // تحميل منتجات أول قسم تلقائياً عند فتح الصفحة
-            if (savedCategories.length > 0) {
-                renderProductsForCategory(savedCategories[0]);
-            }
-        }
-
-        function loadProductsByCategory() {
-            const container = document.getElementById('productsContainer');
-            container.innerHTML = '';
-
-            let savedCategories = JSON.parse(localStorage.getItem('karmashaCategories')) || ["فرايد تشيكن", "تشيكن ستربس"];
-            let products = JSON.parse(localStorage.getItem('products')) || [];
-
-            savedCategories.forEach((cat, index) => {
-                const section = document.createElement('section');
-                section.id = `section-${index}`;
-                section.className = 'product-section';
-
-                const title = document.createElement('h2');
-                title.className = 'section-title';
-                title.textContent = cat;
-                section.appendChild(title);
-
-                const grid = document.createElement('div');
-                grid.className = 'products-grid';
-
-                const categoryProducts = products.filter(product => product.category === cat);
-                categoryProducts.forEach(product => {
-                    const item = `<div class="food-card">
-                        <div class="food-image">
-                            <img src="fried-chicken.jpg" alt="${product.name}">
-                        </div>
-                        <div class="food-details">
-                            <h3>${product.name}</h3>
-                            <p>${product.description}</p>
-                            <div class="options-group">
-                                <label class="option">
-                                    <input type="radio" name="${product.name.replace(/\s/g, '')}" checked>
-                                    <span>عادي <b>${product.price}ج</b></span>
-                                </label>
-                            </div>
-                            <button class="add-to-cart-btn" onclick="addToCart('${product.name}', ${product.price})">أضف للسلة</button>
-                        </div>
-                    </div>`;
-                    grid.innerHTML += item;
-                });
-
-                section.appendChild(grid);
-                container.appendChild(section);
-            });
-        }
-
-        window.cart = [];
-        window.total = 0;
-
-        // دالة فتح وقفل السلة
-        window.toggleCart = function() {
-            const cartSidebar = document.getElementById('cart-sidebar');
-            if (cartSidebar) {
-                cartSidebar.classList.toggle('open');
-            } else {
-                console.error("عنصر السلة غير موجود في الصفحة!");
-            }
-        };
-
-        // إضافة منتج للسلة (استدعيها من زرار الوجبة)
-        function addToCart(name, price) {
-            window.cart.push({ name, price });
-            updateCartUI();
-            // تفتيح السلة تلقائياً عند الإضافة
-            document.getElementById('cart-sidebar').classList.add('open');
-        }
-
-        function updateCartUI() {
-            const cartItems = document.getElementById('cart-items');
-            const cartCount = document.getElementById('cart-count');
-            const cartTotal = document.getElementById('cart-total');
-
-            cartItems.innerHTML = "";
-            window.total = 0;
-
-            window.cart.forEach((item, index) => {
-                window.total += item.price;
-                cartItems.innerHTML += `
-                    <div class="cart-item" style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding:5px;">
-                        <span>${item.name}</span>
-                        <b>${item.price} ج</b>
-                        <button onclick="removeFromCart(${index})" style="color:red; border:none; background:none; cursor:pointer;">حذف</button>
-                    </div>
-                `;
-            });
-
-            cartCount.innerText = window.cart.length;
-            cartTotal.innerText = window.total;
-        }
-        window.updateCartUI = updateCartUI;
-
-        function removeFromCart(index) {
-            window.cart.splice(index, 1);
-            updateCartUI();
-        }
-
-
-
-        // 1. وظائف فتح وقفل المودال
-        function openAuthModal() { document.getElementById('auth-modal').style.display = 'block'; }
-        function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
-        function toggleAuth(type) {
-            document.getElementById('login-form').style.display = type === 'reg' ? 'none' : 'block';
-            document.getElementById('register-form').style.display = type === 'reg' ? 'block' : 'none';
-        }
-
-        // 2. تسجيل حساب جديد (حفظ في LocalStorage)
-        function register() {
-            const name = document.getElementById('reg-name').value;
-            const phone = document.getElementById('reg-phone').value;
-            const pass = document.getElementById('reg-pass').value;
-
-            if (!name || !phone || !pass) return alert("كمل بياناتك يا بطل!");
-
-            let users = JSON.parse(localStorage.getItem('karmashaUsers')) || [];
-            users.push({ name, phone, pass });
-            localStorage.setItem('karmashaUsers', JSON.stringify(users));
-
-            alert("مبروك! حسابك جاهز، سجل دخول دلوقتي.");
-            toggleAuth('login');
-        }
-
-        // 3. تسجيل الدخول
-        let currentUser = JSON.parse(localStorage.getItem('loggedInUser')) || null;
-
-        function login() {
-            const phone = document.getElementById('login-phone').value;
-            const pass = document.getElementById('login-pass').value;
-
-            let users = JSON.parse(localStorage.getItem('karmashaUsers')) || [];
-            const user = users.find(u => u.phone === phone && u.pass === pass);
-
-            if (user) {
-                localStorage.setItem('loggedInUser', JSON.stringify(user));
-                currentUser = user;
-                updateUIForUser();
-                closeAuthModal();
-                alert("أهلاً بك في قرمشة يا " + user.name);
-            } else {
-                alert("بيانات غلط! راجع الموبايل والباسورد.");
-            }
-        }
-
-        // 4. تحديث شكل الصفحة لما يسجل
-        function updateUIForUser() {
-            if (currentUser) {
-                document.getElementById('user-area').innerHTML = `
-                    <div class="user-profile-trigger" onclick="toggleProfileModal()">
-                        <i class="fas fa-user-circle"></i>
-                        <span id="display-user-name">أهلاً ${currentUser.name}</span>
-                    </div>
-                `;
-            } else {
-                document.getElementById('user-area').innerHTML = `
-                    <button onclick="openAuthModal()" class="login-btn-nav shine-btn">
-                        <i class="fas fa-user-circle"></i> دخول / تسجيل
-                    </button>
-                `;
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            location.reload();
-        }
-
-        // وظيفة فتح وقفل البروفايل
-        window.toggleProfileModal = function() {
-            const modal = document.getElementById('profile-modal');
-            if (modal.style.display === 'flex') {
-                modal.style.display = 'none';
-            } else {
-                modal.style.display = 'flex';
-                loadUserOrders(); // حمل الطلبات أول ما يفتح
-            }
-        }
-
-        // تحميل طلبات العميل من فايربيز
-        async function loadUserOrders() {
-            const listContainer = document.getElementById('user-orders-list');
-            const currentUser = JSON.parse(localStorage.getItem('loggedInUser'));
-
-            // لو مفيش مستخدم مسجل دخول، اخرج
-            if (!currentUser || !currentUser.phone) {
-                listContainer.innerHTML = "<p>يرجى تسجيل الدخول أولاً</p>";
-                return;
-            }
-
-            try {
-                const q = query(
-                    collection(window.db, "orders"),
-                    where("customerPhone", "==", currentUser.phone),
-                    orderBy("createdAt", "desc")
-                );
-
-                const querySnapshot = await getDocs(q);
-                listContainer.innerHTML = "";
-
-                if (querySnapshot.empty) {
-                    listContainer.innerHTML = "<p>لسه مفيش طلبات.. اطلب دلوقتي!</p>";
-                    return;
-                }
-
-                querySnapshot.forEach((doc) => {
-                    const order = doc.data();
-                    listContainer.innerHTML += `
-                        <div class="user-order-item">
-                            <span>#${doc.id.substring(0,5)}</span>
-                            <span class="order-status-badge">${order.status}</span>
-                            <b>${order.totalPrice} ج</b>
-                        </div>
-                    `;
-                });
-            } catch (e) {
-                console.error("Error loading orders: ", e);
-                listContainer.innerHTML = "<p>فشل تحميل الطلبات</p>";
-            }
-        }
-
-        // 4. شغل الدالة دي أول ما الصفحة تفتح
-        window.onload = function() {
-            updateUIForUser();
-            loadCategories();
-            window.allProducts = JSON.parse(localStorage.getItem('products')) || [];
-            window.logger = setup_logger();
-        };
-
-        // مراقبة الأقسام وتحديث القائمة تلقائياً
-        function listenToCategories() {
-            const q = query(collection(window.db, "categories"), orderBy("createdAt", "asc"));
-
-            onSnapshot(q, (snapshot) => {
-                const navContainer = document.getElementById('dynamicCategories');
-                navContainer.innerHTML = "";
-
-                snapshot.forEach((doc) => {
-                    const cat = doc.data().name;
-                    navContainer.innerHTML += `
-                        <a href="javascript:void(0)" onclick="renderProductsForCategory('${cat}')" class="nav-item">
-                            ${cat}
-                        </a>
-                    `;
-                });
-            });
-        }
-
-        // وظيفة فتح المودال (تأكد إن الـ ID مطابق)
-        function openAuthModal() {
-            console.log("حاولت أفتح المودال"); // عشان تتأكد في الـ Console إنها شغالة
-            document.getElementById('auth-modal').style.display = 'block';
-        }
-
-        // وظيفة إغلاق المودال
-        function closeAuthModal() {
-            document.getElementById('auth-modal').style.display = 'none';
-        }
-
-        // التبديل بين دخول وتسجيل
-        function toggleAuth(type) {
-            if (type === 'reg') {
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('register-form').style.display = 'block';
-            } else {
-                document.getElementById('login-form').style.display = 'block';
-                document.getElementById('register-form').style.display = 'none';
-            }
-        }
-
-        // إغلاق المودال لو ضغطت في أي مكان بره الصندوق الأبيض
-        window.onclick = function(event) {
-            let modal = document.getElementById('auth-modal');
-            if (event.target == modal) {
-                closeAuthModal();
-            }
-        }
-    </script>
-
-<script type="module">
-        import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        window.allProducts = []; // مخزن للمنتجات
-
-        // 1. تحميل الأقسام من فايربيز (الحل الجذري)
-        async function loadCategoriesFromFirebase() {
-            const nav = document.getElementById('dynamicCategories');
-            nav.innerHTML = '<span style="padding:10px;">جاري تحميل القائمة...</span>';
-
-            try {
-                // جلب الأقسام مرتبة
-                const q = window.query(window.collection(window.db, "categories"), window.orderBy("createdAt", "asc"));
-                const snapshot = await window.getDocs(q);
-
-                nav.innerHTML = ''; // تفريغ
-                let firstCat = null;
-
-                if (snapshot.empty) {
-                    nav.innerHTML = '<span>لا توجد أقسام</span>';
-                    return;
-                }
-
-                snapshot.forEach((doc) => {
-                    const catName = doc.data().name;
-                    if(!firstCat) firstCat = catName; // حفظ أول قسم عشان نفعله
-
-                    nav.innerHTML += `
-                        <a href="javascript:void(0)"
-                           onclick="selectCategory(this, '${catName}')"
-                           class="nav-item ${firstCat === catName ? 'active' : ''}">
-                           ${catName}
-                        </a>`;
-                });
-
-                // بعد ما حملنا الأقسام، نحمل المنتجات ونعرض أول قسم
-                await loadProductsFromFirebase(firstCat);
-
-            } catch (e) {
-                console.error("خطأ في تحميل الأقسام:", e);
-                nav.innerHTML = '<span>خطأ في الاتصال</span>';
-            }
-        }
-
-        // 2. تحميل المنتجات
-        async function loadProductsFromFirebase(defaultCat) {
-            try {
-                const snapshot = await window.getDocs(window.collection(window.db, "products"));
-                window.allProducts = [];
-                snapshot.forEach(doc => {
-                    window.allProducts.push(doc.data());
-                });
-
-                // عرض المنتجات للقسم الافتراضي
-                if(defaultCat) {
-                    renderProductsForCategory(defaultCat);
-                }
-            } catch(e) { console.error(e); }
-        }
-
-        // 3. عرض المنتجات (مع حل مشكلة السعر)
-        window.renderProductsForCategory = function(catName) {
-            const container = document.getElementById('productsContainer');
-            container.innerHTML = '';
-
-            // تصفية المنتجات حسب القسم
-            const filtered = window.allProducts.filter(p => p.category === catName);
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<div style="text-align:center; padding:50px; width:100%;">لا توجد منتجات في قسم ${catName} حالياً</div>`;
-                return;
-            }
-
-            const grid = document.createElement('div');
-            grid.className = 'products-grid';
-
-            filtered.forEach(p => {
-                // إصلاح مشكلة السعر (لو مفيش أسعار حط "حسب الطلب")
-                let displayPrice = "حسب الطلب";
-                if (p.prices && p.prices.length > 0) {
-                    displayPrice = p.prices[0].price + " ج";
-                }
-
-                const pStr = encodeURIComponent(JSON.stringify(p));
-                
-                grid.innerHTML += `
-                    <div class="food-card" onclick="openModal('${pStr}')">
-                        <div class="food-image">
-                            <img src="${p.img || 'https://via.placeholder.com/150'}" onerror="this.src='https://via.placeholder.com/150'">
-                        </div>
-                        <div class="food-details">
-                            <h3>${p.name}</h3>
-                            <span class="price-tag">${displayPrice}</span>
-                            <button class="view-btn">اطلب</button>
-                        </div>
-                    </div>`;
-            });
-            container.appendChild(grid);
-        }
-
-        // باقي الوظائف (تحديد القسم، المودال، إلخ)
-        window.selectCategory = function(el, catName) {
-            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
-            el.classList.add('active');
-            renderProductsForCategory(catName);
-        }
-
-        window.openModal = function(str) {
-            const p = JSON.parse(decodeURIComponent(str));
-            document.getElementById('modal-name').innerText = p.name;
-            document.getElementById('modal-desc').innerText = p.description;
-            document.getElementById('modal-img').src = p.img || '';
             
-            const opts = document.getElementById('price-options-container');
-            opts.innerHTML = '';
-
-            if(p.prices && p.prices.length > 0) {
-                p.prices.forEach((pr, i) => {
-                    opts.innerHTML += `
-                        <label class="size-option">
-                            <input type="radio" name="size" value="${pr.price}" data-name="${pr.size}" ${i===0?'checked':''} 
-                            onchange="document.getElementById('modal-price-display').innerText=this.value"> 
-                            ${pr.size} (${pr.price} ج)
-                        </label>`;
-                });
-                document.getElementById('modal-price-display').innerText = p.prices[0].price;
-            } else {
-                opts.innerHTML = '<p>السعر غير محدد</p>';
-                document.getElementById('modal-price-display').innerText = '0';
-            }
-
-            document.getElementById('modal-add-btn').onclick = () => {
-                const sel = document.querySelector('input[name="size"]:checked');
-                if(sel) {
-                    addToCart(`${p.name} (${sel.dataset.name})`, parseInt(sel.value));
-                    document.getElementById('product-modal').style.display = 'none';
-                } else {
-                    alert("المنتج غير متاح حالياً");
-                }
-            };
-            document.getElementById('product-modal').style.display = 'flex';
-        }
-
-        // تشغيل التحميل عند فتح الصفحة
-        window.onload = function() {
-            setTimeout(() => document.getElementById('loader').style.display = 'none', 1000);
-            loadCategoriesFromFirebase(); // دي الدالة الجديدة اللي هتظبط الدنيا
-        }
-        
-        // (بقيت دوال السلة والتوثيق والشات سيبها زي ما هي أو انسخها من الرد السابق لو ناقصة)
-        // ... (Cart, Auth, Chat functions here) ...
-         // Cart
-        window.cart = []; window.total = 0;
-        window.toggleCart = function() { document.getElementById('cart-sidebar').classList.toggle('open'); }
-        window.addToCart = function(name, price) { window.cart.push({name,price}); updateCartUI(); toggleCart(); }
-        window.updateCartUI = () => {
-            const div = document.getElementById('cart-items'); div.innerHTML=''; window.total=0;
-            window.cart.forEach((i,x)=>{ window.total+=i.price; div.innerHTML+=`<div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>${i.name}</span><span>${i.price} <span style="color:red;cursor:pointer" onclick="window.cart.splice(${x},1);updateCartUI()">x</span></span></div>`; });
-            document.getElementById('cart-total').innerText = window.total; document.getElementById('cart-count').innerText=window.cart.length;
-        }
-        
-        // Auth Helpers
-        window.openAuthModal = () => document.getElementById('auth-modal').style.display='flex';
-        window.closeAuthModal = () => document.getElementById('auth-modal').style.display='none';
-        window.toggleAuth = (t) => {
-            document.getElementById('login-form').style.display = t=='reg'?'none':'block';
-            document.getElementById('register-form').style.display = t=='reg'?'block':'none';
-        }
-        // Auth & Chat Logic (نفس اللي فات)
-        window.registerUser = async function() {
-            const phone = document.getElementById('reg-email').value;
-            const email = phone + "@karmasha.com";
-            const pass = document.getElementById('reg-pass').value;
-            const name = document.getElementById('reg-name').value;
-            try {
-                const cred = await window.createUserWithEmailAndPassword(window.auth, email, pass);
-                await window.setDoc(window.doc(window.db, "users", cred.user.uid), { name: name, phone: phone });
-                alert("تم التسجيل بنجاح!"); closeAuthModal();
-            } catch(e) { alert("خطأ: " + e.message); }
-        }
-
-        window.loginUser = async function() {
-            const phone = document.getElementById('login-email').value;
-            const email = phone.includes('@') ? phone : phone + "@karmasha.com";
-            const pass = document.getElementById('login-pass').value;
-            try {
-                await window.signInWithEmailAndPassword(window.auth, email, pass);
-                closeAuthModal();
-            } catch(e) { alert("رقم الموبايل أو الباسورد غلط"); }
-        }
-
-        window.logoutUser = () => window.signOut(window.auth);
-
-        window.onAuthStateChanged(window.auth, (user) => {
-            window.currentUser = user;
-            if(user) {
-                document.getElementById('user-area').innerHTML = `<span style="color:white; font-size:14px; font-weight:bold">أهلاً بك <br><small onclick="window.logoutUser()" style="cursor:pointer; text-decoration:underline;">خروج</small></span>`;
-                // Auto fill checkout
-                document.getElementById('cust-phone').value = user.email.replace("@karmasha.com", "");
-            } else {
-                document.getElementById('user-area').innerHTML = `<button onclick="openAuthModal()" class="login-btn-nav">دخول</button>`;
-            }
-        }); // قفلة الـ onAuthStateChanged
-
-        // دالة تأكيد الطلب - توضع هنا مرة واحدة فقط
-        document.getElementById('confirmOrderBtn').onclick = async () => {
-            // التأكد إن السلة مش فاضية
-            if (!window.cart || window.cart.length === 0) {
-                return alert("السلة فارغة! اطلب أكلة حلوة الأول 🍗");
-            }
-
-            // سحب البيانات من الحقول
-            const n = document.getElementById('cust-name').value;
-            const p = document.getElementById('cust-phone').value;
-            const a = document.getElementById('cust-address').value;
-
-            // التأكد إن البيانات كاملة
-            if (!n || !p || !a) {
-                return alert("البيانات ناقصة.. كمل بياناتك عشان نجيلك بسرعة!");
-            }
-
-            try {
-                // إرسال الطلب لفايربيز
-                await addDoc(collection(db, "orders"), {
-                    customerName: n,
-                    customerPhone: p,
-                    customerAddress: a,
-                    items: window.cart,
-                    totalPrice: window.total,
-                    status: "جديد",
-                    createdAt: serverTimestamp()
-                });
-
-                alert("تم الطلب بنجاح! طلبك بيتحضر دلوقتي 🍟");
-                window.cart = [];
-                updateCartUI();
-                toggleCart();
-            } catch (e) {
-                console.error("خطأ في الإرسال: ", e);
-                alert("عفواً حصلت مشكلة.. جرب تاني");
-            }
+            const filtered = allProducts.filter(p => p.category === catName);
+            filtered.forEach(p => {
+                const qty = cart[p.id] ? cart[p.id].qty : 0;
+                container.innerHTML += `
+                    <div class="product-item">
+                        <div class="prod-details">
+                            <h3>${p.name}</h3>
+                            <p>${p.description || ''}</p>
+                            <div class="prod-price">${p.prices[0].price} ج.م</div>
+                        </div>
+                        <div class="controls">
+                            ${qty > 0 ? `<span onclick="updateQty('${p.id}', -1)">-</span> <b>${qty}</b>` : ''}
+                            <button class="btn-add" onclick="updateQty('${p.id}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('menu-overlay').style.display = 'block';
         };
 
-    </script> <!-- قفلة السكريبت النهائية -->
+        window.closeMenu = () => document.getElementById('menu-overlay').style.display = 'none';
 
-    <!-- سلة المشتريات الجانبية -->
-    <div id="cart-sidebar" class="cart-sidebar">
-        <div class="cart-header">
-            <h3>طلباتك 🍟</h3>
-            <button onclick="toggleCart()" class="close-btn">&times;</button>
-        </div>
-        <div id="cart-items" class="cart-items">
-            <p class="empty-msg">السلة فارغة.. اطلب دلوقتي!</p>
-        </div>
-        <div class="cart-footer">
-            <div class="total-price">الإجمالي: <span id="cart-total">0</span> ج.م</div>
-            <div class="checkout-form">
-                <h4>بيانات التوصيل</h4>
-                <input type="text" id="cust-name" placeholder="الاسم بالكامل">
-                <input type="tel" id="cust-phone" placeholder="رقم الموبايل">
-                <textarea id="cust-address" placeholder="العنوان بالتفصيل"></textarea>
-                <button id="confirmOrderBtn" class="order-submit-btn">تأكيد الطلب</button>
-            </div>
-        </div>
-    </div>
+        window.updateQty = (id, delta) => {
+            if(!cart[id]) {
+                const p = allProducts.find(x => x.id === id);
+                cart[id] = { name: p.name, price: p.prices[0].price, qty: 0 };
+            }
+            cart[id].qty += delta;
+            if(cart[id].qty <= 0) delete cart[id];
+            
+            let total = 0;
+            for(let key in cart) total += cart[key].price * cart[key].qty;
+            
+            document.getElementById('cart-total').innerText = total + " ج.م";
+            document.getElementById('cart-float').style.display = total > 0 ? 'flex' : 'none';
+            openMenu(document.getElementById('current-cat-name').innerText);
+        };
 
-    <!-- أيقونة السلة (تأكد أنها مكتوبة مرة واحدة فقط هنا) -->
-    <div class="cart-toggle ripple" onclick="toggleCart()">
-        <i class="fas fa-shopping-basket"></i>
-        <span id="cart-count">0</span>
-    </div>
+        window.openCheckout = () => {
+            const name = prompt("الاسم:");
+            const phone = prompt("الموبايل:");
+            const addr = prompt("العنوان:");
+            if(!name || !phone || !addr) return;
 
-<!-- فوتر واحد فقط شيك وبسيط -->
-<footer style="background: #111; color: white; text-align: center; padding: 25px; margin-top: 50px; border-top: 3px solid #e31e24;">
-    <p style="margin: 0; font-family: 'Cairo', sans-serif;">جميع الحقوق محفوظة لمطعم قرمشة © 2024</p>
-</footer>
+            let total = 0, msg = `*طلب جديد من قرمشة*%0Aالاسم: ${name}%0Aالعنوان: ${addr}%0A---%0A`;
+            let itemsArr = [];
 
+            for(let id in cart) {
+                const item = cart[id];
+                total += item.price * item.qty;
+                itemsArr.push({name: item.name, qty: item.qty, price: item.price});
+                msg += `• ${item.name} (x${item.qty}) = ${item.price * item.qty}ج%0A`;
+            }
+            msg += `---%0Aالإجمالي: ${total} ج.م`;
+
+            // إرسال لفايربيز
+            addDoc(collection(db, "orders"), {
+                customerName: name, customerPhone: phone, customerAddress: addr,
+                items: itemsArr, totalPrice: total, status: "جديد", createdAt: serverTimestamp()
+            });
+
+            // فتح الواتساب
+            window.open(`https://wa.me/201122884885?text=${msg}`);
+            location.reload();
+        };
+
+        loadProds();
+    </script>
 </body>
 </html>
