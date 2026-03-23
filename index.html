@@ -69,6 +69,26 @@
         .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
         .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-family: 'Cairo'; box-sizing: border-box; }
         .btn-confirm { background: #25d366; color: white; border: none; width: 100%; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* تنسيق أيقونات التواصل الاجتماعي */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px; /* المسافة بين الأيقونات */
+            margin-top: 10px;
+        }
+
+        .social-links a {
+            color: #777; /* اللون الرمادي مثل الصورة */
+            font-size: 22px; /* حجم الأيقونات */
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            color: var(--main-red); /* يتغير للون الأحمر عند تمرير الماوس */
+            transform: translateY(-3px); /* حركة بسيطة للأعلى */
+        }
     </style>
 </head>
 <body>
@@ -85,6 +105,13 @@
     <div class="res-logo-circle"><img src="5515928d-da81-433e-8bc9-245180ba6724.jpg"></div>
     <h2 id="display-name" style="margin:0">قرمشة - Karmasha</h2>
     <p style="font-size: 12px; color: #777;"><i class="fas fa-map-marker-alt"></i> الطعم الأصلي للقرمشة</p>
+
+    <!-- أيقونات السوشيال ميديا -->
+    <div class="social-links">
+        <a href="رابط_تيك_توك_هنا" target="_blank"><i class="fab fa-tiktok"></i></a>
+        <a href="رابط_فيسبوك_هنا" target="_blank"><i class="fab fa-facebook"></i></a>
+        <a href="رابط_انستجرام_هنا" target="_blank"><i class="fab fa-instagram"></i></a>
+    </div>
 </div>
 
 <!-- البحث -->
