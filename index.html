@@ -166,15 +166,15 @@
             <label>علامة مميزة (اختياري)</label>
             <input type="text" id="cust-landmark" placeholder="بجوار صيدلية كذا...">
         </div>
-        <button class="btn-confirm" onclick="sendToWhatsApp()">
-            تأكيد الطلب عبر الواتساب <i class="fab fa-whatsapp"></i>
+        <button class="btn-confirm" onclick="confirmOrder()">
+            تأكيد الطلب 📱 <i class="fas fa-check-circle"></i>
         </button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyClhjCiMrdiFP4oGYktlLKBHP2Rtbj9ezQ",
@@ -323,7 +323,7 @@
         document.getElementById('checkout-modal').style.display = 'none';
     };
 
-    window.sendToWhatsApp = () => {
+    window.confirmOrder = async () => {
         const name = document.getElementById('cust-name').value;
         const phone = document.getElementById('cust-phone').value;
         const address = document.getElementById('cust-address').value;
@@ -334,29 +334,41 @@
             return;
         }
 
-        let orderText = `*طلب جديد من مطعم قرمشة 🍗*%0A%0A`;
-        orderText += `*الاسم:* ${name}%0A`;
-        orderText += `*الموبايل:* ${phone}%0A`;
-        orderText += `*العنوان:* ${address}%0A`;
-        if(landmark) orderText += `*علامة مميزة:* ${landmark}%0A`;
-        orderText += `%0A*--- الطلبات ---*%0A`;
-
-        let total = 0;
+        // تحضير بيانات الطلب للفايربيز (نفس الهيكل اللي بيستقبله admin.html)
+        const orderItems = [];
+        let totalPrice = 0;
         for(let id in cart) {
             const item = cart[id];
-            orderText += `• ${item.name} (${item.qty}) = ${item.price * item.qty}ج%0A`;
-            total += item.price * item.qty;
+            orderItems.push({
+                name: item.name,
+                qty: item.qty,
+                price: item.price
+            });
+            totalPrice += item.price * item.qty;
         }
 
-        orderText += `%0A*الإجمالي الكلي: ${total} ج.م*%0A%0A_شكراً لاختياركم قرمشة!_`;
+        const orderData = {
+            customerName: name,
+            customerPhone: phone,
+            customerAddress: address + (landmark ? ` (${landmark})` : ''),
+            items: orderItems,
+            totalPrice: totalPrice,
+            status: "جديد",
+            createdAt: serverTimestamp()
+        };
 
-        const waNumber = "201122884885";
-        window.open(`https://wa.me/${waNumber}?text=${orderText}`, '_blank');
-        
-        // إعادة ضبط السلة بعد الطلب
-        cart = {};
-        document.getElementById('cart-float').style.display = 'none';
-        closeCheckout();
+        try {
+            await addDoc(collection(db, "orders"), orderData);
+            alert("✅ تم إرسال الطلب للإدارة بنجاح!\nسيتصل بك الموظف قريباً لتأكيد التفاصيل.");
+            
+            // إعادة ضبط السلة والمودال
+            cart = {};
+            document.getElementById('cart-float').style.display = 'none';
+            closeCheckout();
+        } catch (error) {
+            console.error("خطأ في إرسال الطلب:", error);
+            alert("حدث خطأ في الإرسال. جرب مرة أخرى أو تواصل مع الإدارة.");
+        }
     };
 
     initData();
